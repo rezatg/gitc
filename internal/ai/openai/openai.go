@@ -1,0 +1,128 @@
+package openai
+
+import (
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/bytedance/sonic"
+	"github.com/rezatg/gitc/internal/ai"
+	"github.com/rezatg/gitc/pkg/utils"
+	"github.com/valyala/fasthttp"
+	"github.com/valyala/fasthttp/fasthttpproxy"
+)
+
+// OpenAIProvider implements the AIProvider interface for OpenAI
+type OpenAIProvider struct {
+	apiKey string
+	client *fasthttp.Client
+	url    string
+}
+
+type Request struct {
+	Model string `json:"model"`
+	// Store       bool      `json:"store"`
+	Messages    []Message `json:"messages"`
+	MaxTokens   int       `json:"max_tokens,omitempty"`
+	Temperature float32   `json:"temperature,omitempty"`
+}
+
+type Response struct {
+	Choices []struct {
+		Message Message `json:"message"`
+	} `json:"choices"`
+	Error struct {
+		Message string `json:"message"`
+	} `json:"error,omitempty"`
+}
+
+type Message struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// NewOpenAIProvider creates a new OpenAI provider
+func NewOpenAIProvider(apiKey, proxy string) (*OpenAIProvider, error) {
+	if apiKey == "" {
+		return nil, fmt.Errorf("API key is required")
+	}
+
+	client := &fasthttp.Client{
+		MaxConnsPerHost: 10,
+	}
+
+	// Configure proxy if provided
+	if proxy != "" {
+		client.Dial = fasthttpproxy.FasthttpHTTPDialer(proxy)
+	}
+
+	return &OpenAIProvider{
+		apiKey: apiKey,
+		client: client,
+		url:    "https://api.openai.com/v1/chat/completions",
+	}, nil
+}
+
+// GenerateCommitMessage generates a commit message using OpenAI API
+func (p *OpenAIProvider) GenerateCommitMessage(opts ai.Options) (string, error) {
+	prompt := utils.GetPromptForSingleCommit(opts.Diff, opts.CommitType, opts.CustomConvention, opts.Language)
+	reqBody := Request{
+		Model: opts.Model,
+		// Store: false,
+		Messages: []Message{
+			{"system", "You are an AI assistant that generates Git commit messages."},
+			{"user", prompt},
+		},
+		MaxTokens:   max(128, opts.MaxLength/3), // More tokens for complete messages
+		Temperature: 0.7,                        // Slightly creative but controlled
+	}
+
+	jsonData, err := sonic.Marshal(reqBody)
+	if err != nil {
+		return "", fmt.Errorf("❌ Failed to encode JSON: %v", err)
+	}
+
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
+	req.SetRequestURI(p.url)
+	req.Header.SetMethod("POST")
+	req.Header.Set("Authorization", "Bearer "+p.apiKey)
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBody(jsonData)
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	if err := p.client.DoTimeout(req, resp, 30*time.Second); err != nil {
+		return "", fmt.Errorf("❌ API request failed: %w", err)
+	}
+
+	if statusCode := resp.StatusCode(); statusCode != fasthttp.StatusOK {
+		return "", fmt.Errorf("❌ API returned status %d: %s", statusCode, resp.Body())
+	}
+
+	var res Response
+	if err = sonic.Unmarshal(resp.Body(), &res); err != nil {
+		return "", fmt.Errorf("❌ Failed to parse response: %v", err)
+	}
+
+	if res.Error.Message != "" {
+		return "", fmt.Errorf("API error: %s", res.Error.Message)
+	} else if len(res.Choices) == 0 {
+		return "", fmt.Errorf("❌ no response from OpenAI")
+	}
+
+	commitMessage := strings.TrimSpace(res.Choices[0].Message.Content)
+
+	// Ensure message is not empty
+	if commitMessage == "" {
+		return "", fmt.Errorf("❌ empty commit message generated")
+	}
+
+	if len(commitMessage) > opts.MaxLength {
+		commitMessage = commitMessage[:opts.MaxLength]
+	}
+
+	return commitMessage, nil
+}
