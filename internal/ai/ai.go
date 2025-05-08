@@ -12,13 +12,14 @@ type AIProvider interface {
 
 // Config holds AI provider configuration
 type Config struct {
-	Ai           string
-	APIKey       string
-	Timeout      time.Duration
-	MaxLength    int
-	Model        string
-	Language     string
-	MaxRedirects int
+	Ai               string
+	APIKey           string
+	Timeout          time.Duration
+	MaxLength        int
+	Model            string
+	Language         string
+	CustomConvention string
+	MaxRedirects     int
 }
 
 type MessageOptions struct {

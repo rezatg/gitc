@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/rezatg/gitc/internal/ai"
 	"github.com/rezatg/gitc/internal/ai/openai"
 	"github.com/rezatg/gitc/internal/git"
@@ -76,6 +77,15 @@ func (a *App) CommitAction(c *cli.Context) error {
 		a.config.Proxy = proxy
 	}
 
+	if customConvention := c.String("custom-convention"); customConvention != "" {
+		var tmp string
+		if err := sonic.Unmarshal([]byte(customConvention), &tmp); err != nil {
+			return fmt.Errorf("❌ invalid JSON for custom-convention: %v", err)
+		}
+
+		aiConfig.CustomConvention = tmp
+	}
+
 	// Validate required fields
 	if aiConfig.Ai == "" {
 		return fmt.Errorf("❌ AI provider must be specified (use --ai or set in config)")
@@ -108,7 +118,7 @@ func (a *App) CommitAction(c *cli.Context) error {
 			Model:            aiConfig.Model,
 			Language:         aiConfig.Language,
 			CommitType:       c.String("commit-type"),
-			CustomConvention: c.String("custom-convention"),
+			CustomConvention: aiConfig.CustomConvention,
 			MaxLength:        aiConfig.MaxLength,
 			MaxRedirects:     aiConfig.MaxRedirects,
 		})
@@ -121,7 +131,7 @@ func (a *App) CommitAction(c *cli.Context) error {
 	}
 
 	fmt.Println("✅ Commit message generated. You can now run:")
-	fmt.Printf("   git commit -m %q\n", msg)
+	fmt.Printf(`   git commit -m "%s"\n`, msg)
 	return nil
 }
 
