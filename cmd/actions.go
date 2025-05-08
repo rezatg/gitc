@@ -9,6 +9,7 @@ import (
 	"github.com/rezatg/gitc/internal/ai/openai"
 	"github.com/rezatg/gitc/internal/git"
 	"github.com/rezatg/gitc/pkg/config"
+	"github.com/rezatg/gitc/pkg/utils"
 	"github.com/urfave/cli/v2"
 )
 
@@ -39,12 +40,13 @@ func (a *App) CommitAction(c *cli.Context) error {
 
 	// Prepare AI configuration from CLI flags or config
 	aiConfig := ai.Config{
-		Ai:        c.String("ai"),
-		Model:     c.String("model"),
-		APIKey:    c.String("api-key"),
-		Timeout:   time.Duration(c.Int("timeout")) * time.Second,
-		MaxLength: c.Int("maxLength"),
-		Language:  c.String("lang"),
+		Ai:           c.String("ai"),
+		Model:        c.String("model"),
+		APIKey:       c.String("api-key"),
+		Timeout:      time.Duration(c.Int("timeout")) * time.Second,
+		MaxLength:    c.Int("maxLength"),
+		Language:     c.String("lang"),
+		MaxRedirects: c.Int("max-redirects"),
 	}
 
 	// Apply defaults from config if not provided via CLI
@@ -66,6 +68,9 @@ func (a *App) CommitAction(c *cli.Context) error {
 	if aiConfig.Language == "" {
 		aiConfig.Language = a.config.Language
 	}
+	if aiConfig.MaxRedirects == 0 {
+		aiConfig.MaxRedirects = a.config.MaxRedirects
+	}
 
 	if proxy := c.String("proxy"); proxy != "" {
 		a.config.Proxy = proxy
@@ -78,6 +83,8 @@ func (a *App) CommitAction(c *cli.Context) error {
 	if aiConfig.APIKey == "" {
 		return fmt.Errorf("❌ API key must be specified (use --api-key or set in config)")
 	}
+
+	useGitmoji := c.Bool("emoji") || a.config.UseGitmoji
 
 	// Initialize AI provider
 	var provider ai.AIProvider
@@ -95,21 +102,22 @@ func (a *App) CommitAction(c *cli.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), aiConfig.Timeout)
 	defer cancel()
 
-	msg, err := provider.GenerateCommitMessage(ai.Options{
-		Context:          ctx,
-		Diff:             diff,
-		Model:            aiConfig.Model,
-		Language:         aiConfig.Language,
-		CommitType:       c.String("commit-type"),
-		CustomConvention: c.String("custom-convention"),
-		MaxLength:        aiConfig.MaxLength,
-	})
+	msg, err := provider.GenerateCommitMessage(
+		ctx, diff,
+		ai.MessageOptions{
+			Model:            aiConfig.Model,
+			Language:         aiConfig.Language,
+			CommitType:       c.String("commit-type"),
+			CustomConvention: c.String("custom-convention"),
+			MaxLength:        aiConfig.MaxLength,
+			MaxRedirects:     aiConfig.MaxRedirects,
+		})
 	if err != nil {
 		return fmt.Errorf("❌ failed to generate commit message: %v", err)
 	}
 
-	if c.Bool("gitmoji") || a.config.UseGitmoji {
-
+	if useGitmoji {
+		msg = utils.AddGitmojiToCommitMessage(msg)
 	}
 
 	fmt.Println("✅ Commit message generated. You can now run:")
@@ -155,6 +163,9 @@ func (a *App) ConfigAction(c *cli.Context) error {
 	}
 	if c.IsSet("emoji") {
 		cfg.UseGitmoji = c.Bool("emoji")
+	}
+	if c.Int("max-redirects") != 0 {
+		cfg.MaxRedirects = c.Int("max-redirects")
 	}
 
 	// Save updated config

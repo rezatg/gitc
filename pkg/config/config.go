@@ -19,7 +19,9 @@ type Config struct {
 	CommitType       string `json:"commit_type"`
 	CustomConvention string `json:"custom-convention"`
 	UseGitmoji       bool   `json:"use_gitmoji"`
-	OpenAI           OpenAI `json:"open_ai"`
+	MaxRedirects     int    `json:"max_redirects"`
+
+	OpenAI OpenAI `json:"open_ai"`
 }
 
 // OpenAI holds OpenAI-specific configuration
@@ -39,6 +41,8 @@ func DefaultConfig() *Config {
 		CommitType:       "",
 		CustomConvention: "",
 		UseGitmoji:       false,
+		MaxRedirects:     5,
+
 		OpenAI: OpenAI{
 			APIKey: os.Getenv("AI_API_KEY"), // Load from env if available
 			Model:  "gpt-4o-mini",

@@ -1,9 +1,9 @@
 package openai
 
 import (
+	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/bytedance/sonic"
 	"github.com/rezatg/gitc/internal/ai"
@@ -64,8 +64,8 @@ func NewOpenAIProvider(apiKey, proxy string) (*OpenAIProvider, error) {
 }
 
 // GenerateCommitMessage generates a commit message using OpenAI API
-func (p *OpenAIProvider) GenerateCommitMessage(opts ai.Options) (string, error) {
-	prompt := utils.GetPromptForSingleCommit(opts.Diff, opts.CommitType, opts.CustomConvention, opts.Language)
+func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string, opts ai.MessageOptions) (string, error) {
+	prompt := utils.GetPromptForSingleCommit(diff, opts.CommitType, opts.CustomConvention, opts.Language)
 	reqBody := Request{
 		Model: opts.Model,
 		// Store: false,
@@ -73,8 +73,8 @@ func (p *OpenAIProvider) GenerateCommitMessage(opts ai.Options) (string, error) 
 			{"system", "You are an AI assistant that generates Git commit messages."},
 			{"user", prompt},
 		},
-		MaxTokens:   max(128, opts.MaxLength/3), // More tokens for complete messages
-		Temperature: 0.7,                        // Slightly creative but controlled
+		MaxTokens:   max(512, opts.MaxLength), // More tokens for complete messages
+		Temperature: 0.7,                      // Slightly creative but controlled
 	}
 
 	jsonData, err := sonic.Marshal(reqBody)
@@ -94,7 +94,7 @@ func (p *OpenAIProvider) GenerateCommitMessage(opts ai.Options) (string, error) 
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
 
-	if err := p.client.DoTimeout(req, resp, 30*time.Second); err != nil {
+	if err := p.client.DoRedirects(req, resp, opts.MaxRedirects); err != nil {
 		return "", fmt.Errorf("❌ API request failed: %w", err)
 	}
 

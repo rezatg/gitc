@@ -7,25 +7,25 @@ import (
 
 // AIProvider defines the interface for AI providers
 type AIProvider interface {
-	GenerateCommitMessage(opts Options) (string, error)
+	GenerateCommitMessage(ctx context.Context, diff string, opts MessageOptions) (string, error)
 }
 
 // Config holds AI provider configuration
 type Config struct {
-	Ai        string
-	APIKey    string
-	Timeout   time.Duration
-	MaxLength int
-	Model     string
-	Language  string
+	Ai           string
+	APIKey       string
+	Timeout      time.Duration
+	MaxLength    int
+	Model        string
+	Language     string
+	MaxRedirects int
 }
 
-type Options struct {
-	Context          context.Context
-	Diff             string
+type MessageOptions struct {
 	Model            string
 	Language         string
 	CommitType       string
 	CustomConvention string
 	MaxLength        int
+	MaxRedirects     int
 }

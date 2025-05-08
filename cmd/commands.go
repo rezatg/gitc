@@ -37,7 +37,7 @@ var Commands = &cli.App{
 		},
 		&cli.IntFlag{
 			Name:  "maxLength",
-			Value: 100,
+			Value: 200,
 			Usage: "Set maximum output length of AI response",
 		},
 		&cli.StringFlag{
@@ -69,6 +69,13 @@ var Commands = &cli.App{
 			Aliases: []string{"g"},
 			Usage:   "Add Gitmoji to the commit message based on commit type",
 			EnvVars: []string{"GITC_GITMOJI"},
+		},
+		&cli.IntFlag{
+			Name:    "max-redirects",
+			Aliases: []string{"r"},
+			Value:   5,
+			Usage:   "Maximum number of HTTP redirects to follow",
+			EnvVars: []string{"GITC_MAX_REDIRECTS"},
 		},
 		&cli.StringFlag{
 			Name:    "config",
@@ -128,6 +135,11 @@ var Commands = &cli.App{
 				&cli.IntFlag{
 					Name:  "maxLength",
 					Usage: "Set maximum output length of AI response",
+				},
+				&cli.IntFlag{
+					Name:    "max-redirects",
+					Aliases: []string{"r"},
+					Usage:   "Set maximum number of HTTP redirects",
 				},
 				&cli.StringFlag{
 					Name:    "api-key",
