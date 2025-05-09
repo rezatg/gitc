@@ -8,11 +8,16 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Version defines the current version of the gitc tool.
+const Version = "0.1.0"
+
 var appInstance *App
 
+// Commands defines the CLI application configuration.
 var Commands = &cli.App{
-	Name:  "ai-commit",
-	Usage: "Generate AI-powered commit messages",
+	Name:    "gitc",
+	Usage:   "Generate AI-powered commit messages",
+	Version: Version,
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "provider",

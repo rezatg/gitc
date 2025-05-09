@@ -28,7 +28,6 @@ go install github.com/rezatg/gitc@latest
 1. Download binary from [releases](https://github.com/rezatg/gitc/releases)
 2. `chmod +x gitc`
 3. Move to `/usr/local/bin`
-<br>
 
 
 ## 🚀 Features
