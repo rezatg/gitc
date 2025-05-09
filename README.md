@@ -13,7 +13,7 @@
 </p>
 
 
-## 📦 Installation :
+## 📦 Installation
 ### Prerequisites :
 - Go: Version **1.18** or higher (required for building from source).
 - Git: Required for retrieving staged changes.
@@ -24,11 +24,17 @@
 go install github.com/rezatg/gitc@latest
 ```
 
-### Manual Install :
+### Manual Install
 1. Download binary from [releases](https://github.com/rezatg/gitc/releases)
 2. `chmod +x gitc`
 3. Move to `/usr/local/bin`
 
+## Verify Installation
+After installation, verify the tool is installed correctly and check its version:
+
+```bash
+gitc --version
+```
 
 ## 🚀 Features
 AI-Commit streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
@@ -57,7 +63,7 @@ AI-Commit streamlines your Git workflow by automating professional commit messag
 - **Fast Processing**: Leverages `sonic` for rapid JSON parsing and `fasthttp` for efficient HTTP requests.
 - **Error Handling**: Robust validation and error messages ensure reliable operation.
 
-# ⚙️ Configuration :
+# ⚙️ Configuration
 Config File (`~/.gitc/config.json`) :
 ```json
 {
@@ -78,14 +84,14 @@ Config File (`~/.gitc/config.json`) :
 }
 ```
 
-## Environment Variables :
+## Environment Variables
 ```bash
 export OPENAI_API_KEY="sk-your-key-here"
 export GITC_LANGUAGE="fa"
 export GITC_MODEL="gpt-4"
 ```
 
-# 💻 Basic Usage :
+# 💻 Basic Usage
 ```bash
 # Stage your changes first
 git add .
