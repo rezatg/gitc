@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./assets/logo.jpg" alt="gitc AI-Powered Commits" style="clip-path: inset(35px 0 35px 0);margin: 0; padding: 0px, border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <img src="https://github.com/rezatg/gitc/blob/master/assets/logo.jpg" alt="gitc AI-Powered Commits" style="clip-path: inset(35px 0 35px 0);margin: 0; padding: 0px, border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </div>
 
 # ✨ gitc - AI-Powered Git Commit Messages
@@ -24,11 +24,11 @@
 
 <br>
 <div align="center">
-  <img src="./assets/demo.png" alt="demo" style="height: auto;border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <img src="https://github.com/rezatg/gitc/blob/master/assets/demo.png" alt="demo" style="height: auto;border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </div>
 
 ## 🚀 Features
-AI-Commit streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
+gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
 
 ### AI and Commit Generation
 - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
