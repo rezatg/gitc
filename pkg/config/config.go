@@ -9,7 +9,6 @@ import (
 )
 
 // Config holds application configuration
-// Config holds application configuration
 type Config struct {
 	AI               string `json:"ai"`
 	MaxLength        int    `json:"max_length"`
@@ -28,6 +27,7 @@ type Config struct {
 type OpenAI struct {
 	APIKey string `json:"api_key"`
 	Model  string `json:"model"`
+	URL    string `json:"url"`
 }
 
 // DefaultConfig returns a configuration with default values
@@ -46,6 +46,7 @@ func DefaultConfig() *Config {
 		OpenAI: OpenAI{
 			APIKey: os.Getenv("AI_API_KEY"), // Load from env if available
 			Model:  "gpt-4o-mini",
+			URL:    "",
 		},
 	}
 }

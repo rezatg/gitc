@@ -112,7 +112,7 @@ var Commands = &cli.App{
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:    "ai",
-					Aliases: []string{"a"},
+					Aliases: []string{"ai"},
 					Usage:   "AI provider to use (openai, anthropic)",
 				},
 				&cli.StringFlag{
@@ -169,12 +169,21 @@ var Commands = &cli.App{
 				},
 			},
 			Action: func(c *cli.Context) error {
-				// Set config path if provided for config command
+				// Set config path if provided
 				if configPath := c.String("config"); configPath != "" {
 					config.SetConfigPath(configPath)
 				}
 
-				return appInstance.ConfigAction(c)
+				// Load config
+				cfg, err := config.Load()
+				if err != nil {
+					return fmt.Errorf("failed to load config: %w", err)
+				}
+
+				// Initialize dependencies
+				gitService := git.NewGitService()
+				app := NewApp(gitService, cfg)
+				return app.ConfigAction(c)
 			},
 		},
 	},

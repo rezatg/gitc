@@ -12,6 +12,8 @@ import (
 	"github.com/valyala/fasthttp/fasthttpproxy"
 )
 
+const defaultOpenAIURL = "https://api.openai.com/v1/chat/completions"
+
 // OpenAIProvider implements the AIProvider interface for OpenAI
 type OpenAIProvider struct {
 	apiKey string
@@ -42,9 +44,13 @@ type Message struct {
 }
 
 // NewOpenAIProvider creates a new OpenAI provider
-func NewOpenAIProvider(apiKey, proxy string) (*OpenAIProvider, error) {
+func NewOpenAIProvider(apiKey, proxy, url string) (*OpenAIProvider, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("API key is required")
+	}
+
+	if url == "" {
+		url = defaultOpenAIURL
 	}
 
 	client := &fasthttp.Client{
@@ -59,7 +65,7 @@ func NewOpenAIProvider(apiKey, proxy string) (*OpenAIProvider, error) {
 	return &OpenAIProvider{
 		apiKey: apiKey,
 		client: client,
-		url:    "https://api.openai.com/v1/chat/completions",
+		url:    url,
 	}, nil
 }
 

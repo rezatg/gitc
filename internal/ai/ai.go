@@ -20,6 +20,8 @@ type Config struct {
 	Language         string
 	CustomConvention string
 	MaxRedirects     int
+
+	Proxy string
 }
 
 type MessageOptions struct {

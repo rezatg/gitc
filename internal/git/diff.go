@@ -15,19 +15,18 @@ type GitService interface {
 }
 
 // gitServiceImpl implements GitService
-type gitServiceImpl struct{}
+type gitServiceImpl struct {
+	excludeFiles []string
+}
 
 // NewGitService creates a new GitService
-func NewGitService() GitService {
-	return &gitServiceImpl{}
+func NewGitService(excludeFiles ...string) GitService {
+	return &gitServiceImpl{
+		excludeFiles: append(defaultExcludeFiles, excludeFiles...),
+	}
 }
 
-// GetDiff retrieves the git diff for staged changes
-func (g *gitServiceImpl) GetDiff(ctx context.Context) (string, error) {
-	return GetDiffStaged(ctx, nil)
-}
-
-// defaultExcludeFiles is a list of default files and patterns to exclude.
+// Default exclude files and patterns
 var defaultExcludeFiles = []string{
 	"package-lock.json",
 	"pnpm-lock.yaml",
@@ -56,7 +55,12 @@ var defaultExcludeFiles = []string{
 	"*.swp",
 }
 
-// getGitRoot retrieves the root directory of the git repository.
+// GetDiff retrieves the git diff for staged changes
+func (g *gitServiceImpl) GetDiff(ctx context.Context) (string, error) {
+	return GetDiffStaged(ctx, g.excludeFiles)
+}
+
+// getGitRoot retrieves the root directory of the git repository
 func getGitRoot() (string, error) {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 	var out bytes.Buffer
@@ -68,23 +72,27 @@ func getGitRoot() (string, error) {
 	return strings.TrimSpace(out.String()), nil
 }
 
-// getExcludeFileArgs converts exclude paths into git diff exclude args.
-func getExcludeFileArgs(extra []string) []string {
-	all := append(defaultExcludeFiles, extra...)
-	args := make([]string, 0, len(all))
-	for _, f := range all {
+// getExcludeFileArgs converts exclude paths into git diff exclude args
+func getExcludeFileArgs(excludeFiles []string) []string {
+	args := make([]string, 0, len(excludeFiles))
+	for _, f := range excludeFiles {
 		args = append(args, fmt.Sprintf(":(exclude)%s", f))
 	}
 	return args
 }
 
-// processDiff applies additional cleanup to reduce unnecessary lines.
+// processDiff applies cleanup to reduce unnecessary lines
 func processDiff(diff string) string {
+	var builder strings.Builder
 	lines := strings.Split(diff, "\n")
-	var result []string
-	var inHunk bool
+	inHunk := false
 
 	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
 		// Skip non-informative lines
 		if strings.HasPrefix(line, "index ") ||
 			strings.HasPrefix(line, "--- ") ||
@@ -106,18 +114,14 @@ func processDiff(diff string) string {
 			}
 		}
 
-		// Skip empty lines
-		if strings.TrimSpace(line) == "" {
-			continue
-		}
-
-		result = append(result, line)
+		builder.WriteString(line)
+		builder.WriteString("\n")
 	}
 
-	return strings.TrimSpace(strings.Join(result, "\n"))
+	return strings.TrimSpace(builder.String())
 }
 
-// GetDiffStaged retrieves the optimized git diff for staged changes with exclusions.
+// GetDiffStaged retrieves the optimized git diff for staged changes with exclusions
 func GetDiffStaged(ctx context.Context, extraExcludeFiles []string) (string, error) {
 	rootPath, err := getGitRoot()
 	if err != nil {
@@ -128,14 +132,14 @@ func GetDiffStaged(ctx context.Context, extraExcludeFiles []string) (string, err
 	args := []string{
 		"diff",
 		"--staged",
-		"--diff-algorithm=minimal", // Minimize diff output
-		"--unified=3",              // Reduce context lines
-		"--ignore-all-space",       // Ignore whitespace changes
-		"--ignore-blank-lines",     // Ignore blank lines
-		"--no-color",               // Remove color codes
-		"--no-ext-diff",            // Disable external diff tools
-		"--no-renames",             // Ignore file renames
-		"--ignore-submodules",      // Ignore submodule changes
+		"--diff-algorithm=minimal",
+		"--unified=3",
+		"--ignore-all-space",
+		"--ignore-blank-lines",
+		"--no-color",
+		"--no-ext-diff",
+		"--no-renames",
+		"--ignore-submodules",
 	}
 	args = append(args, getExcludeFileArgs(extraExcludeFiles)...)
 

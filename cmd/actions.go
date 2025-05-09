@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/bytedance/sonic"
@@ -28,19 +29,9 @@ func NewApp(gitService git.GitService, config *config.Config) *App {
 	}
 }
 
-// CommitAction handles the generation of commit messages
-func (a *App) CommitAction(c *cli.Context) error {
-	// Load git diff
-	diff, err := a.gitService.GetDiff(context.Background())
-	if err != nil {
-		return fmt.Errorf("❌ failed to get git diff: %v", err)
-	}
-	if diff == "" {
-		return fmt.Errorf("❌ nothing staged for commit")
-	}
-
-	// Prepare AI configuration from CLI flags or config
-	aiConfig := ai.Config{
+// buildAIConfig constructs the AI configuration from CLI flags and defaults
+func (a *App) buildAIConfig(c *cli.Context) (ai.Config, error) {
+	cfg := ai.Config{
 		Ai:           c.String("ai"),
 		Model:        c.String("model"),
 		APIKey:       c.String("api-key"),
@@ -50,62 +41,80 @@ func (a *App) CommitAction(c *cli.Context) error {
 		MaxRedirects: c.Int("max-redirects"),
 	}
 
-	// Apply defaults from config if not provided via CLI
-	if aiConfig.Ai == "" {
-		aiConfig.Ai = a.config.AI
+	// Apply defaults from config if not provided
+	if cfg.Ai == "" {
+		cfg.Ai = a.config.AI
 	}
-	if aiConfig.Model == "" {
-		aiConfig.Model = a.config.OpenAI.Model
+	if cfg.Model == "" {
+		cfg.Model = a.config.OpenAI.Model
 	}
-	if aiConfig.APIKey == "" {
-		aiConfig.APIKey = a.config.OpenAI.APIKey
+	if cfg.APIKey == "" {
+		cfg.APIKey = a.config.OpenAI.APIKey
 	}
-	if aiConfig.Timeout == 0 {
-		aiConfig.Timeout = time.Duration(a.config.Timeout) * time.Second
+	if cfg.Timeout == 0 {
+		cfg.Timeout = time.Duration(a.config.Timeout) * time.Second
 	}
-	if aiConfig.MaxLength == 0 {
-		aiConfig.MaxLength = a.config.MaxLength
+	if cfg.MaxLength == 0 {
+		cfg.MaxLength = a.config.MaxLength
 	}
-	if aiConfig.Language == "" {
-		aiConfig.Language = a.config.Language
+	if cfg.Language == "" {
+		cfg.Language = a.config.Language
 	}
-	if aiConfig.MaxRedirects == 0 {
-		aiConfig.MaxRedirects = a.config.MaxRedirects
+	if cfg.MaxRedirects == 0 {
+		cfg.MaxRedirects = a.config.MaxRedirects
 	}
 
+	// Handle proxy
 	if proxy := c.String("proxy"); proxy != "" {
-		a.config.Proxy = proxy
+		cfg.Proxy = proxy
 	}
 
+	// Handle custom convention
 	if customConvention := c.String("custom-convention"); customConvention != "" {
 		var tmp string
 		if err := sonic.Unmarshal([]byte(customConvention), &tmp); err != nil {
-			return fmt.Errorf("❌ invalid JSON for custom-convention: %v", err)
+			return ai.Config{}, fmt.Errorf("invalid JSON for custom-convention: %w", err)
 		}
-
-		aiConfig.CustomConvention = tmp
+		cfg.CustomConvention = tmp
 	}
 
 	// Validate required fields
-	if aiConfig.Ai == "" {
-		return fmt.Errorf("❌ AI provider must be specified (use --ai or set in config)")
+	if cfg.Ai == "" {
+		return ai.Config{}, fmt.Errorf("AI provider must be specified (use --ai or set in config)")
 	}
-	if aiConfig.APIKey == "" {
-		return fmt.Errorf("❌ API key must be specified (use --api-key or set in config)")
+	if cfg.APIKey == "" {
+		return ai.Config{}, fmt.Errorf("API key must be specified (use --api-key or set in config)")
 	}
 
-	useGitmoji := c.Bool("emoji") || a.config.UseGitmoji
+	return cfg, nil
+}
+
+// CommitAction handles the generation of commit messages
+func (a *App) CommitAction(c *cli.Context) error {
+	// Load git diff
+	diff, err := a.gitService.GetDiff(context.Background())
+	if err != nil {
+		return fmt.Errorf("❌ failed to get git diff: %v", err)
+	} else if diff == "" {
+		return fmt.Errorf("❌ nothing staged for commit")
+	}
+
+	// Build AI configuration
+	aiConfig, err := a.buildAIConfig(c)
+	if err != nil {
+		return fmt.Errorf("failed to build AI config: %w", err)
+	}
 
 	// Initialize AI provider
 	var provider ai.AIProvider
 	switch aiConfig.Ai {
 	case "openai":
-		provider, err = openai.NewOpenAIProvider(aiConfig.APIKey, a.config.Proxy)
+		provider, err = openai.NewOpenAIProvider(aiConfig.APIKey, aiConfig.Proxy, a.config.OpenAI.URL)
 		if err != nil {
-			return fmt.Errorf("❌ failed to initialize OpenAI provider: %v", err)
+			return fmt.Errorf("failed to initialize OpenAI provider: %w", err)
 		}
 	default:
-		return fmt.Errorf("❌ unsupported AI provider: %s", aiConfig.Ai)
+		return fmt.Errorf("unsupported AI provider: %s", aiConfig.Ai)
 	}
 
 	// Generate commit message
@@ -126,63 +135,63 @@ func (a *App) CommitAction(c *cli.Context) error {
 		return fmt.Errorf("❌ failed to generate commit message: %v", err)
 	}
 
-	if useGitmoji {
+	// Apply Gitmoji if enabled
+	if c.Bool("emoji") || a.config.UseGitmoji {
 		msg = utils.AddGitmojiToCommitMessage(msg)
 	}
 
 	fmt.Println("✅ Commit message generated. You can now run:")
-	fmt.Printf(`   git commit -m "%s"\n`, msg)
+	fmt.Printf("   git commit -m \"%s\"\n", strings.ReplaceAll(msg, "\n", ""))
 	return nil
 }
 
 // ConfigAction handles configuration updates
 func (a *App) ConfigAction(c *cli.Context) error {
-	// Load existing config
-	cfg, err := config.Load()
-	if err != nil {
-		return fmt.Errorf("❌ failed to load config: %v", err)
-	}
+	// Create a copy of the current config
+	cfg := *a.config
 
 	// Update fields based on CLI arguments
-	if c.String("ai") != "" {
-		cfg.AI = c.String("ai")
+	if ai := c.String("ai"); ai != "" {
+		cfg.AI = ai
 	}
-	if c.String("model") != "" {
-		cfg.OpenAI.Model = c.String("model")
+	if model := c.String("model"); model != "" {
+		cfg.OpenAI.Model = model
 	}
-	if c.String("api-key") != "" {
-		cfg.OpenAI.APIKey = c.String("api-key")
+	if apiKey := c.String("api-key"); apiKey != "" {
+		cfg.OpenAI.APIKey = apiKey
 	}
-	if c.String("lang") != "" {
-		cfg.Language = c.String("lang")
+	if lang := c.String("lang"); lang != "" {
+		cfg.Language = lang
 	}
-	if c.Int("timeout") != 0 {
-		cfg.Timeout = c.Int("timeout")
+	if timeout := c.Int("timeout"); timeout != 0 {
+		cfg.Timeout = timeout
 	}
-	if c.Int("maxLength") != 0 {
-		cfg.MaxLength = c.Int("maxLength")
+	if maxLength := c.Int("maxLength"); maxLength != 0 {
+		cfg.MaxLength = maxLength
 	}
-	if c.String("proxy") != "" {
-		cfg.Proxy = c.String("proxy")
+	if proxy := c.String("proxy"); proxy != "" {
+		cfg.Proxy = proxy
 	}
-	if c.String("commit-type") != "" {
-		cfg.CommitType = c.String("commit-type")
+	if commitType := c.String("commit-type"); commitType != "" {
+		cfg.CommitType = commitType
 	}
-	if c.String("custom-convention") != "" {
-		cfg.CustomConvention = c.String("custom-convention")
+	if customConvention := c.String("custom-convention"); customConvention != "" {
+		cfg.CustomConvention = customConvention
 	}
 	if c.IsSet("emoji") {
 		cfg.UseGitmoji = c.Bool("emoji")
 	}
-	if c.Int("max-redirects") != 0 {
-		cfg.MaxRedirects = c.Int("max-redirects")
+	if maxRedirects := c.Int("max-redirects"); maxRedirects != 0 {
+		cfg.MaxRedirects = maxRedirects
 	}
 
 	// Save updated config
-	if err := config.Save(cfg); err != nil {
-		return fmt.Errorf("❌ failed to save config: %v", err)
+	if err := config.Save(&cfg); err != nil {
+		return fmt.Errorf("failed to save config: %w", err)
 	}
 
+	// Update the app's config
+	a.config = &cfg
 	fmt.Println("✅ Configuration updated successfully")
 	return nil
 }
