@@ -6,19 +6,25 @@ import (
 	"strings"
 )
 
+// Define the mapping of commit types to Gitmojis
+var typeToGitmoji = map[string]string{
+	"feat":     "✨",  // New feature
+	"fix":      "🚑",  // Bug fix
+	"docs":     "📝",  // Documentation
+	"style":    "💄",  // Code style
+	"refactor": "♻️", // Code refactoring
+	"perf":     "⚡️", // Performance improvements
+	"test":     "✅",  // Tests
+	"chore":    "🔧",  // Maintenance
+	"build":    "🏗️", // Build system
+	"ci":       "🤖",  // CI/CD
+	"revert":   "⏪",  // Reverts
+	"init":     "🎉",  // Initial commit
+	"security": "🔒",  // Security fixes
+}
+
 // AddGitmojiToCommitMessage adds a Gitmoji to the commit message based on its type.
 func AddGitmojiToCommitMessage(commitMessage string) string {
-	// Define the mapping of commit types to Gitmojis
-	typeToGitmoji := map[string]string{
-		"feat":     "✨",
-		"fix":      "🚑",
-		"docs":     "📝",
-		"style":    "💄",
-		"refactor": "♻️",
-		"test":     "✅",
-		"chore":    "🔧",
-	}
-
 	// Extract the commit type (e.g., "feat" from "feat: description")
 	match := regexp.MustCompile(`^[a-zA-Z]+`).FindString(commitMessage)
 	if match == "" {

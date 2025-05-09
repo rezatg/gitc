@@ -45,7 +45,7 @@ AI-Commit streamlines your Git workflow by automating professional commit messag
 - **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
 
 ### Commit Standards and Customization
-- **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`) for semantic versioning.
+- **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
 - **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
 - **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
 

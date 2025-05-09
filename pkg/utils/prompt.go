@@ -34,8 +34,7 @@ feat: add new feature
 Add feature to improve performance. Update config handling.
 
 Only return the commit message, no explanations.`,
-		diff,
-		language,
+		diff, language,
 		getTypeInstruction(commitType),
 		getConventionInstruction(customMessageConvention))
 }
@@ -44,7 +43,7 @@ func getTypeInstruction(commitType string) string {
 	if commitType != "" {
 		return fmt.Sprintf("Use type '%s'", commitType)
 	}
-	return "Choose appropriate type (feat, fix, docs, style, refactor, test, chore)"
+	return "Choose appropriate type (feat, fix, docs, style, refactor, test, chore, build, ci, revert, init, security)"
 }
 
 func getConventionInstruction(convention string) string {
