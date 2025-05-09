@@ -5,7 +5,7 @@
 # ✨ gitc - AI-Powered Git Commit Messages
 
 <div align="center" style="padding-bottom: 5px;">
-  <a href="#installation">Installation</a> •
+  <a href="#-installation">Installation</a> •
   <a href="#features">Features</a> •
   <a href="#configuration">Configuration</a> •
   <a href="#basic-usage">Usage</a> •
@@ -27,7 +27,7 @@
   <img src="./assets/demo.png" alt="demo" style="height: auto;border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </div>
 
-## 🚀 Features {#features}
+## 🚀 Features
 AI-Commit streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
 
 ### AI and Commit Generation
@@ -54,7 +54,7 @@ AI-Commit streamlines your Git workflow by automating professional commit messag
 - **Fast Processing**: Leverages `sonic` for rapid JSON parsing and `fasthttp` for efficient HTTP requests.
 - **Error Handling**: Robust validation and error messages ensure reliable operation.
 
-## 📦 Installation {#installation}
+## 📦 Installation
 ### Prerequisites:
 - Go: Version **1.18** or higher (required for building from source).
 - Git: Required for retrieving staged changes.
@@ -77,7 +77,7 @@ After installation, verify the tool is installed correctly and check its version
 gitc --version
 ```
 
-# 💻 Basic Usage {#basic-usage}
+# 💻 Basic Usage
 ```bash
 # 1. Stage your changes
 git add . # or gitc -a
@@ -98,7 +98,7 @@ export GITC_LANGUAGE="fa"
 export GITC_MODEL="gpt-4"
 ```
 
-# ⚙️ Configuration {#configuration}
+# ⚙️ Configuration
 Config File (`~/.gitc/config.json`) :
 ```json
 {
@@ -119,7 +119,7 @@ Config File (`~/.gitc/config.json`) :
 }
 ```
 
-## 📚 Full Options {#full-options}
+## 📚 Full Options
 The following CLI flags are available for the `ai-commit` command and its `config` subcommand. All flags can also be set via environment variables or the `~/.gitc/config.json` file.
 
 | Flag | Alias | Description | Default | Environment Variable | Example |
@@ -144,7 +144,7 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 - Environment variables take precedence over config file settings but are overridden by CLI flags.
 
 
-## 🤖 AI Providers {#ai-providers}
+## 🤖 AI Providers
 Currently, `ai-commit` supports the following AI providers. Additional providers (e.g., Anthropic) are planned for future releases.
 
 | Provider | Supported Models | Required Configuration | Notes |
