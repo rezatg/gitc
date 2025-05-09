@@ -110,7 +110,7 @@ func (a *App) CommitAction(c *cli.Context) error {
 	}
 
 	fmt.Println("✅ Commit message generated. You can now run:")
-	fmt.Printf("   git commit -m \"%s\"\n", strings.ReplaceAll(msg, "\n", " "))
+	fmt.Printf("   git commit -m \"%s\"\n", strings.ReplaceAll(msg, "\n", ""))
 	return nil
 }
 
