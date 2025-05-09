@@ -11,6 +11,23 @@
 <p align="center">
   <img src="./logo.png" alt="logo project" style="height: auto border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </p>
+
+
+## 📦 Installation :
+### Prerequisites :
+- Go: Version **1.18** or higher (required for building from source).
+- Git: Required for retrieving staged changes.
+- OpenAI API Key: Required for AI-powered commit message generation. Set it via the `AI_API_KEY` environment variable or in the config file.
+
+#### Using Go:
+```bash
+go install github.com/rezatg/gitc@latest
+```
+
+### Manual Install :
+1. Download binary from [releases](https://github.com/rezatg/gitc/releases)
+2. `chmod +x gitc`
+3. Move to `/usr/local/bin`
 <br>
 
 
@@ -40,23 +57,6 @@ AI-Commit streamlines your Git workflow by automating professional commit messag
 ### Performance and Reliability
 - **Fast Processing**: Leverages `sonic` for rapid JSON parsing and `fasthttp` for efficient HTTP requests.
 - **Error Handling**: Robust validation and error messages ensure reliable operation.
-
-## 📦 Installation :
-### Prerequisites :
-- Go: Version **1.18** or higher (required for building from source).
-- Git: Required for retrieving staged changes.
-- OpenAI API Key: Required for AI-powered commit message generation. Set it via the `AI_API_KEY` environment variable or in the config file.
-
-#### Using Go:
-```bash
-go install github.com/rezatg/gitc@latest
-```
-
-### Manual Install :
-1. Download binary from [releases](https://github.com/rezatg/gitc/releases)
-2. `chmod +x gitc`
-3. Move to `/usr/local/bin`
-<br>
 
 # ⚙️ Configuration :
 Config File (`~/.gitc/config.json`) :
