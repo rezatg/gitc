@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/bytedance/sonic"
 	"github.com/rezatg/gitc/internal/ai"
 	"github.com/rezatg/gitc/internal/ai/openai"
 	"github.com/rezatg/gitc/internal/git"
@@ -29,21 +29,36 @@ func NewApp(gitService git.GitService, config *config.Config) *App {
 	}
 }
 
-// buildAIConfig constructs the AI configuration from CLI flags and defaults
-func (a *App) buildAIConfig(c *cli.Context) (ai.Config, error) {
-	cfg := ai.Config{
-		Ai:           c.String("ai"),
-		Model:        c.String("model"),
-		APIKey:       c.String("api-key"),
-		Timeout:      time.Duration(c.Int("timeout")) * time.Second,
-		MaxLength:    c.Int("maxLength"),
-		Language:     c.String("lang"),
-		MaxRedirects: c.Int("max-redirects"),
+// buildAIConfig constructs the AI configuration with proper validation
+func (a *App) buildAIConfig(c *cli.Context) (*ai.Config, error) {
+	cfg := &ai.Config{
+		Provider:         c.String("provider"),
+		Model:            c.String("model"),
+		APIKey:           c.String("api-key"),
+		Timeout:          time.Duration(c.Int("timeout")) * time.Second,
+		MaxLength:        c.Int("max-length"),
+		Language:         c.String("lang"),
+		MaxRedirects:     c.Int("max-redirects"),
+		Proxy:            c.String("proxy"),
+		CommitType:       c.String("commit-type"),
+		CustomConvention: c.String("custom-convention"),
+		UseGitmoji:       c.Bool("emoji"),
 	}
 
-	// Apply defaults from config if not provided
-	if cfg.Ai == "" {
-		cfg.Ai = a.config.AI
+	// Apply config defaults
+	a.applyConfigDefaults(cfg)
+
+	// Validate configuration
+	if err := a.validateConfig(cfg); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func (a *App) applyConfigDefaults(cfg *ai.Config) {
+	if cfg.Provider == "" {
+		cfg.Provider = a.config.Provider
 	}
 	if cfg.Model == "" {
 		cfg.Model = a.config.OpenAI.Model
@@ -63,30 +78,23 @@ func (a *App) buildAIConfig(c *cli.Context) (ai.Config, error) {
 	if cfg.MaxRedirects == 0 {
 		cfg.MaxRedirects = a.config.MaxRedirects
 	}
-
-	// Handle proxy
-	if proxy := c.String("proxy"); proxy != "" {
-		cfg.Proxy = proxy
+	if !cfg.UseGitmoji {
+		cfg.UseGitmoji = a.config.UseGitmoji
 	}
+}
 
-	// Handle custom convention
-	if customConvention := c.String("custom-convention"); customConvention != "" {
-		var tmp string
-		if err := sonic.Unmarshal([]byte(customConvention), &tmp); err != nil {
-			return ai.Config{}, fmt.Errorf("invalid JSON for custom-convention: %w", err)
-		}
-		cfg.CustomConvention = tmp
+func (a *App) validateConfig(cfg *ai.Config) error {
+	switch {
+	case cfg.Provider == "":
+		return errors.New("AI provider must be specified")
+	case cfg.APIKey == "":
+		return errors.New("API key is required")
+	case cfg.Timeout <= 0:
+		return errors.New("timeout must be positive")
+	case cfg.MaxLength <= 0:
+		return errors.New("max length must be positive")
 	}
-
-	// Validate required fields
-	if cfg.Ai == "" {
-		return ai.Config{}, fmt.Errorf("AI provider must be specified (use --ai or set in config)")
-	}
-	if cfg.APIKey == "" {
-		return ai.Config{}, fmt.Errorf("API key must be specified (use --api-key or set in config)")
-	}
-
-	return cfg, nil
+	return nil
 }
 
 // CommitAction handles the generation of commit messages
@@ -107,14 +115,14 @@ func (a *App) CommitAction(c *cli.Context) error {
 
 	// Initialize AI provider
 	var provider ai.AIProvider
-	switch aiConfig.Ai {
+	switch aiConfig.Provider {
 	case "openai":
 		provider, err = openai.NewOpenAIProvider(aiConfig.APIKey, aiConfig.Proxy, a.config.OpenAI.URL)
 		if err != nil {
 			return fmt.Errorf("failed to initialize OpenAI provider: %w", err)
 		}
 	default:
-		return fmt.Errorf("unsupported AI provider: %s", aiConfig.Ai)
+		return fmt.Errorf("unsupported AI provider: %s", aiConfig.Provider)
 	}
 
 	// Generate commit message
@@ -151,8 +159,8 @@ func (a *App) ConfigAction(c *cli.Context) error {
 	cfg := *a.config
 
 	// Update fields based on CLI arguments
-	if ai := c.String("ai"); ai != "" {
-		cfg.AI = ai
+	if provider := c.String("provider"); provider != "" {
+		cfg.Provider = provider
 	}
 	if model := c.String("model"); model != "" {
 		cfg.OpenAI.Model = model

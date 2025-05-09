@@ -10,7 +10,7 @@ import (
 
 // Config holds application configuration
 type Config struct {
-	AI               string `json:"ai"`
+	Provider         string `json:"provider"`
 	MaxLength        int    `json:"max_length"`
 	Proxy            string `json:"proxy"`
 	Language         string `json:"language"`
@@ -33,7 +33,7 @@ type OpenAI struct {
 // DefaultConfig returns a configuration with default values
 func DefaultConfig() *Config {
 	return &Config{
-		AI:               "openai",
+		Provider:         "openai",
 		MaxLength:        200,
 		Proxy:            "",
 		Language:         "en",
@@ -87,8 +87,8 @@ func Load() (*Config, error) {
 
 	// Apply defaults for unset fields
 	defaults := DefaultConfig()
-	if cfg.AI == "" {
-		cfg.AI = defaults.AI
+	if cfg.Provider == "" {
+		cfg.Provider = defaults.Provider
 	}
 	if cfg.MaxLength == 0 {
 		cfg.MaxLength = defaults.MaxLength

@@ -15,7 +15,7 @@ var Commands = &cli.App{
 	Usage: "Generate AI-powered commit messages",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:    "ai",
+			Name:    "provider",
 			Aliases: []string{"a"},
 			Value:   "openai",
 			Usage:   "AI provider to use (openai, anthropic)",
@@ -111,7 +111,7 @@ var Commands = &cli.App{
 			Usage:   "Configure AI provider settings",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:    "ai",
+					Name:    "provider",
 					Aliases: []string{"ai"},
 					Usage:   "AI provider to use (openai, anthropic)",
 				},

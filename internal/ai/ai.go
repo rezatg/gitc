@@ -12,14 +12,16 @@ type AIProvider interface {
 
 // Config holds AI provider configuration
 type Config struct {
-	Ai               string
+	Provider         string
 	APIKey           string
 	Timeout          time.Duration
 	MaxLength        int
 	Model            string
 	Language         string
+	CommitType       string
 	CustomConvention string
 	MaxRedirects     int
+	UseGitmoji       bool
 
 	Proxy string
 }
