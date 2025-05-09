@@ -1,4 +1,9 @@
 # gitc - ✨ AI-Powered Git Commit Messages
+[![Go Reference](https://pkg.go.dev/badge/github.com/rezatg/gotube#section-readme.svg)](https://pkg.go.dev/github.com/rezatg/gitc)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/rezatg/gitc?logo=go)](go.mod)
+[![Sourcegraph](https://sourcegraph.com/github.com/rezatg/gitc/-/badge.svg)](https://sourcegraph.com/github.com/rezatg/gitc?badge)
+[![Discussions](https://img.shields.io/github/discussions/rezatg/gitc?color=58a6ff&label=Discussions&logo=github)](https://github.com/rezatg/gitc/discussions)
+
 
 **AI-Commit is a command-line tool that leverages AI to generate professional Git commit messages based on staged changes. It supports Conventional Commits, Gitmoji, and customizable commit message conventions, making it ideal for developers who want to streamline their commit workflow. Powered by OpenAI, it analyzes your git diff and produces clear, concise, and context-aware commit messages.**
 

@@ -100,13 +100,13 @@ func (a *App) CommitAction(c *cli.Context) error {
 	// Configure AI settings
 	cfg, err := a.ConfigureAI(c)
 	if err != nil {
-		return fmt.Errorf("failed to build AI config: %w", err)
+		return fmt.Errorf("❌ failed to build AI config: %w", err)
 	}
 
 	// Generate commit message
 	msg, err := a.generateCommitMessage(c.Context, diff, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to generate commit message: %w", err)
+		return fmt.Errorf("❌ failed to generate commit message: %w", err)
 	}
 
 	fmt.Println("✅ Commit message generated. You can now run:")
