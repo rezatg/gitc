@@ -1,6 +1,6 @@
 # gitc - ✨ AI-Powered Git Commit Messages
 
-- ***AI-Commit is a command-line tool that leverages AI to generate professional Git commit messages based on staged changes. It supports Conventional Commits, Gitmoji, and customizable commit message conventions, making it ideal for developers who want to streamline their commit workflow. Powered by OpenAI, it analyzes your git diff and produces clear, concise, and context-aware commit messages.***
+**AI-Commit is a command-line tool that leverages AI to generate professional Git commit messages based on staged changes. It supports Conventional Commits, Gitmoji, and customizable commit message conventions, making it ideal for developers who want to streamline their commit workflow. Powered by OpenAI, it analyzes your git diff and produces clear, concise, and context-aware commit messages.**
 
 
 ## 🚀 Features
@@ -30,16 +30,12 @@ AI-Commit streamlines your Git workflow by automating professional commit messag
 ### Performance and Reliability
 - **Fast Processing**: Leverages `sonic` for rapid JSON parsing and `fasthttp` for efficient HTTP requests.
 - **Error Handling**: Robust validation and error messages ensure reliable operation.
-<br>
-<br>
 
 ## 📦 Installation :
 ### Prerequisites :
 - Go: Version **1.18** or higher (required for building from source).
 - Git: Required for retrieving staged changes.
 - OpenAI API Key: Required for AI-powered commit message generation. Set it via the `AI_API_KEY` environment variable or in the config file.
-<br>
-<br>
 
 #### Using Go:
 ```bash
@@ -50,7 +46,6 @@ go install github.com/rezatg/gitc@latest
 1. Download binary from [releases](https://github.com/rezatg/gitc/releases)
 2. `chmod +x gitc`
 3. Move to `/usr/local/bin`
-<br>
 <br>
 
 # ⚙️ Configuration :
