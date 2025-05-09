@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -30,7 +29,7 @@ func NewApp(gitService git.GitService, config *config.Config) *App {
 }
 
 // buildAIConfig constructs the AI configuration with proper validation
-func (a *App) buildAIConfig(c *cli.Context) (*ai.Config, error) {
+func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 	cfg := &ai.Config{
 		Provider:         c.String("provider"),
 		Model:            c.String("model"),
@@ -48,14 +47,98 @@ func (a *App) buildAIConfig(c *cli.Context) (*ai.Config, error) {
 	// Apply config defaults
 	a.applyConfigDefaults(cfg)
 
-	// Validate configuration
-	if err := a.validateConfig(cfg); err != nil {
-		return nil, err
+	// Validate required fields
+	if err := a.validateConfig(a.config); err != nil {
+		return nil, fmt.Errorf("invalid AI configuration: %w", err)
 	}
 
 	return cfg, nil
 }
 
+// GenerateCommitMessage generates a commit message based on git diff and AI configuration.
+func (a *App) generateCommitMessage(ctx context.Context, diff string, cfg *ai.Config) (string, error) {
+	// Initialize AI provider
+	provider, err := a.initAIProvider(cfg)
+	if err != nil {
+		return "", fmt.Errorf("failed to initialize AI provider: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, cfg.Timeout)
+	defer cancel()
+
+	opts := ai.MessageOptions{
+		Model:            cfg.Model,
+		Language:         cfg.Language,
+		CommitType:       cfg.CommitType,
+		CustomConvention: cfg.CustomConvention,
+		MaxLength:        cfg.MaxLength,
+	}
+
+	msg, err := provider.GenerateCommitMessage(ctx, diff, opts)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate commit message: %w", err)
+	}
+
+	// Apply Gitmoji if enabled
+	if cfg.UseGitmoji {
+		msg = utils.AddGitmojiToCommitMessage(msg)
+	}
+
+	return msg, nil
+}
+
+// CommitAction handles the generation of commit messages
+func (a *App) CommitAction(c *cli.Context) error {
+	// Fetch git diff for staged changes
+	diff, err := a.gitService.GetDiff(context.Background())
+	if err != nil {
+		return fmt.Errorf("❌ failed to get git diff: %v", err)
+	} else if diff == "" {
+		return fmt.Errorf("❌ nothing staged for commit")
+	}
+
+	// Configure AI settings
+	cfg, err := a.ConfigureAI(c)
+	if err != nil {
+		return fmt.Errorf("failed to build AI config: %w", err)
+	}
+
+	// Generate commit message
+	msg, err := a.generateCommitMessage(c.Context, diff, cfg)
+	if err != nil {
+		return fmt.Errorf("failed to generate commit message: %w", err)
+	}
+
+	fmt.Println("✅ Commit message generated. You can now run:")
+	fmt.Printf("   git commit -m \"%s\"\n", strings.ReplaceAll(msg, "\n", " "))
+	return nil
+}
+
+// ConfigAction handles configuration updates
+func (a *App) ConfigAction(c *cli.Context) error {
+	// Create a copy of the current config
+	cfg := *a.config
+
+	// Update config fields from CLI flags
+	a.updateConfigFromFlags(&cfg, c)
+
+	// Validate updated config
+	if err := a.validateConfig(&cfg); err != nil {
+		return fmt.Errorf("invalid configuration: %w", err)
+	}
+
+	// Save updated config
+	if err := config.Save(&cfg); err != nil {
+		return fmt.Errorf("failed to save config: %w", err)
+	}
+
+	// Update app's config
+	a.config = &cfg
+	fmt.Println("✅ Configuration updated successfully")
+	return nil
+}
+
+// applyConfigDefaults sets default values for unset AI configuration fields.
 func (a *App) applyConfigDefaults(cfg *ai.Config) {
 	if cfg.Provider == "" {
 		cfg.Provider = a.config.Provider
@@ -78,87 +161,35 @@ func (a *App) applyConfigDefaults(cfg *ai.Config) {
 	if cfg.MaxRedirects == 0 {
 		cfg.MaxRedirects = a.config.MaxRedirects
 	}
-	if !cfg.UseGitmoji {
-		cfg.UseGitmoji = a.config.UseGitmoji
-	}
 }
 
-func (a *App) validateConfig(cfg *ai.Config) error {
+// validateConfig checks if the application configuration is valid.
+func (a *App) validateConfig(cfg *config.Config) error {
 	switch {
 	case cfg.Provider == "":
-		return errors.New("AI provider must be specified")
-	case cfg.APIKey == "":
-		return errors.New("API key is required")
+		return fmt.Errorf("AI provider is required")
+	case cfg.OpenAI.APIKey == "":
+		return fmt.Errorf("API key is required")
 	case cfg.Timeout <= 0:
-		return errors.New("timeout must be positive")
+		return fmt.Errorf("timeout must be positive")
 	case cfg.MaxLength <= 0:
-		return errors.New("max length must be positive")
+		return fmt.Errorf("max length must be positive")
 	}
 	return nil
 }
 
-// CommitAction handles the generation of commit messages
-func (a *App) CommitAction(c *cli.Context) error {
-	// Load git diff
-	diff, err := a.gitService.GetDiff(context.Background())
-	if err != nil {
-		return fmt.Errorf("❌ failed to get git diff: %v", err)
-	} else if diff == "" {
-		return fmt.Errorf("❌ nothing staged for commit")
-	}
-
-	// Build AI configuration
-	aiConfig, err := a.buildAIConfig(c)
-	if err != nil {
-		return fmt.Errorf("failed to build AI config: %w", err)
-	}
-
-	// Initialize AI provider
-	var provider ai.AIProvider
-	switch aiConfig.Provider {
+// initAIProvider initializes the AI provider based on the configuration.
+func (a *App) initAIProvider(cfg *ai.Config) (ai.AIProvider, error) {
+	switch cfg.Provider {
 	case "openai":
-		provider, err = openai.NewOpenAIProvider(aiConfig.APIKey, aiConfig.Proxy, a.config.OpenAI.URL)
-		if err != nil {
-			return fmt.Errorf("failed to initialize OpenAI provider: %w", err)
-		}
+		return openai.NewOpenAIProvider(cfg.APIKey, cfg.Proxy, a.config.OpenAI.URL)
 	default:
-		return fmt.Errorf("unsupported AI provider: %s", aiConfig.Provider)
+		return nil, fmt.Errorf("unsupported AI provider: %s", cfg.Provider)
 	}
-
-	// Generate commit message
-	ctx, cancel := context.WithTimeout(context.Background(), aiConfig.Timeout)
-	defer cancel()
-
-	msg, err := provider.GenerateCommitMessage(
-		ctx, diff,
-		ai.MessageOptions{
-			Model:            aiConfig.Model,
-			Language:         aiConfig.Language,
-			CommitType:       c.String("commit-type"),
-			CustomConvention: aiConfig.CustomConvention,
-			MaxLength:        aiConfig.MaxLength,
-			MaxRedirects:     aiConfig.MaxRedirects,
-		})
-	if err != nil {
-		return fmt.Errorf("❌ failed to generate commit message: %v", err)
-	}
-
-	// Apply Gitmoji if enabled
-	if c.Bool("emoji") || a.config.UseGitmoji {
-		msg = utils.AddGitmojiToCommitMessage(msg)
-	}
-
-	fmt.Println("✅ Commit message generated. You can now run:")
-	fmt.Printf("   git commit -m \"%s\"\n", strings.ReplaceAll(msg, "\n", ""))
-	return nil
 }
 
-// ConfigAction handles configuration updates
-func (a *App) ConfigAction(c *cli.Context) error {
-	// Create a copy of the current config
-	cfg := *a.config
-
-	// Update fields based on CLI arguments
+// updateConfigFromFlags updates the configuration based on CLI flags..
+func (a *App) updateConfigFromFlags(cfg *config.Config, c *cli.Context) {
 	if provider := c.String("provider"); provider != "" {
 		cfg.Provider = provider
 	}
@@ -189,17 +220,7 @@ func (a *App) ConfigAction(c *cli.Context) error {
 	if c.IsSet("emoji") {
 		cfg.UseGitmoji = c.Bool("emoji")
 	}
-	if maxRedirects := c.Int("max-redirects"); maxRedirects != 0 {
+	if maxRedirects := c.Int("max-redirects"); c.Int("max-redirects") != 0 {
 		cfg.MaxRedirects = maxRedirects
 	}
-
-	// Save updated config
-	if err := config.Save(&cfg); err != nil {
-		return fmt.Errorf("failed to save config: %w", err)
-	}
-
-	// Update the app's config
-	a.config = &cfg
-	fmt.Println("✅ Configuration updated successfully")
-	return nil
 }
