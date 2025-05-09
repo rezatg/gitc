@@ -19,11 +19,16 @@ var Commands = &cli.App{
 	Usage:   "Generate AI-powered commit messages",
 	Version: Version,
 	Flags: []cli.Flag{
-		&cli.StringFlag{
-			Name:    "provider",
+		&cli.BoolFlag{
+			Name:    "all",
 			Aliases: []string{"a"},
-			Value:   "openai",
-			Usage:   "AI provider to use (openai, anthropic)",
+			Usage:   "Stage all changes before generating commit message (equivalent to 'git add .')",
+			EnvVars: []string{"GITC_STAGE_ALL"},
+		},
+		&cli.StringFlag{
+			Name:  "provider",
+			Value: "openai",
+			Usage: "AI provider to use (openai, anthropic)",
 		},
 		&cli.StringFlag{
 			Name:  "model",

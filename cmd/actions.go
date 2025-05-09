@@ -89,8 +89,16 @@ func (a *App) generateCommitMessage(ctx context.Context, diff string, cfg *ai.Co
 
 // CommitAction handles the generation of commit messages
 func (a *App) CommitAction(c *cli.Context) error {
+	// Stage all changes if --all (-a) flag is set
+	if c.Bool("all") {
+		if err := a.gitService.StageAll(c.Context); err != nil {
+			return fmt.Errorf("❌ failed to stage changes: %v", err)
+		}
+
+		fmt.Println("✅ All changes staged successfully")
+	}
 	// Fetch git diff for staged changes
-	diff, err := a.gitService.GetDiff(context.Background())
+	diff, err := a.gitService.GetDiff(c.Context)
 	if err != nil {
 		return fmt.Errorf("❌ failed to get git diff: %v", err)
 	} else if diff == "" {

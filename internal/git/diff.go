@@ -12,6 +12,7 @@ import (
 // GitService defines the interface for git operations
 type GitService interface {
 	GetDiff(ctx context.Context) (string, error)
+	StageAll(ctx context.Context) error
 }
 
 // gitServiceImpl implements GitService
@@ -168,4 +169,15 @@ func GetDiffStaged(ctx context.Context, extraExcludeFiles []string) (string, err
 	}
 
 	return optimizedDiff, nil
+}
+
+// StageAll stages all changes in the working directory (equivalent to 'git add .').
+// It respects the provided context for cancellation and timeouts.
+func (s *gitServiceImpl) StageAll(ctx context.Context) error {
+	cmd := exec.CommandContext(ctx, "git", "add", ".")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("git add . failed: %s", string(output))
+	}
+
+	return nil
 }

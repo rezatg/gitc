@@ -106,7 +106,7 @@ AI-Commit streamlines your Git workflow by automating professional commit messag
 # 💻 Basic Usage
 ```bash
 # 1. Stage your changes
-git add .
+git add . # or gitc -a
 
 # 2. Generate perfect commit message
 gitc
@@ -150,7 +150,8 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 
 | Flag | Alias | Description | Default | Environment Variable | Example |
 |------|-------|-------------|---------|----------------------|---------|
-| `--provider` | `-a` | AI provider to use (e.g., `openai`, `anthropic`) | `openai` | `AI_PROVIDER` | `--provider openai` |
+| `--all` | `-a` | Stage all changes before generating commit message (equivalent to `git add .`) | `false` | `GITC_STAGE_ALL` | `-all` or `-a`
+| `--provider` | - | AI provider to use (e.g., `openai`, `anthropic`) | `openai` | `AI_PROVIDER` | `--provider openai` |
 | `--model` | - | OpenAI model for commit message generation | `gpt-4o-mini` | - | `--model gpt-4o` |
 | `--lang` | - | Language for commit messages (e.g., `en`, `fa`, `ru`) | `en` | `GITC_LANGUAGE` | `--lang fa` |
 | `--timeout` | - | Request timeout in seconds | `10` | - | `--timeout 15` |
