@@ -4,13 +4,13 @@
 
 # ✨ gitc - AI-Powered Git Commit Messages
 
-<div align="center" style="padding-bottom: 5px;">
+<div align="center">
   <a href="#-installation">Installation</a> •
-  <a href="#features">Features</a> •
-  <a href="#configuration">Configuration</a> •
-  <a href="#basic-usage">Usage</a> •
-  <a href="#full-options">Full Options</a> •
-  <a href="#ai-providers">AI Providers</a>
+  <a href="#-features">Features</a> •
+  <a href="#-configuration">Configuration</a> •
+  <a href="#-basic-usage">Usage</a> •
+  <a href="#-full-options">Full Options</a> •
+  <a href="#-ai-providers">AI Providers</a>
 </div>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/rezatg/gitc)](https://pkg.go.dev/github.com/rezatg/gitc)
