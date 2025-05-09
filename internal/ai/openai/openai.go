@@ -85,7 +85,7 @@ func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string,
 
 	jsonData, err := sonic.Marshal(reqBody)
 	if err != nil {
-		return "", fmt.Errorf("❌ Failed to encode JSON: %v", err)
+		return "", fmt.Errorf("failed to encode JSON: %v", err)
 	}
 
 	req := fasthttp.AcquireRequest()
@@ -101,29 +101,33 @@ func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string,
 	defer fasthttp.ReleaseResponse(resp)
 
 	if err := p.client.DoRedirects(req, resp, opts.MaxRedirects); err != nil {
-		return "", fmt.Errorf("❌ API request failed: %w", err)
-	}
-
-	if statusCode := resp.StatusCode(); statusCode != fasthttp.StatusOK {
-		return "", fmt.Errorf("❌ API returned status %d: %s", statusCode, resp.Body())
+		return "", fmt.Errorf("API request failed: %w", err)
 	}
 
 	var res Response
 	if err = sonic.Unmarshal(resp.Body(), &res); err != nil {
-		return "", fmt.Errorf("❌ Failed to parse response: %v", err)
+		return "", fmt.Errorf("failed to parse response: %v", err)
+	}
+
+	if statusCode := resp.StatusCode(); statusCode != fasthttp.StatusOK {
+		if res.Error.Message != "" {
+			return "", fmt.Errorf("API error [%d]: %s", statusCode, res.Error.Message)
+		}
+
+		return "", fmt.Errorf("API returned status %d: %s", statusCode, resp.Body())
 	}
 
 	if res.Error.Message != "" {
 		return "", fmt.Errorf("API error: %s", res.Error.Message)
 	} else if len(res.Choices) == 0 {
-		return "", fmt.Errorf("❌ no response from OpenAI")
+		return "", fmt.Errorf("no response from OpenAI")
 	}
 
 	commitMessage := strings.TrimSpace(res.Choices[0].Message.Content)
 
 	// Ensure message is not empty
 	if commitMessage == "" {
-		return "", fmt.Errorf("❌ empty commit message generated")
+		return "", fmt.Errorf("empty commit message generated")
 	}
 
 	if len(commitMessage) > opts.MaxLength {
