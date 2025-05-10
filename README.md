@@ -86,9 +86,6 @@ gitc --emoji --lang fa
 
 # Custom commit type
 gitc --commit-type fix
-
-# Display tool version
-gitc --version
 ```
 
 ## 🚀 See It in Action
@@ -151,12 +148,16 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 - Environment variables take precedence over config file settings but are overridden by CLI flags.
 
 ## 🤖 AI Providers
-Currently, `ai-commit` supports the following AI providers. Additional providers (e.g., Anthropic) are planned for future releases.
+`gitc` is designed to be AI-provider agnostic. While it currently supports OpenAI out of the box, support for additional providers is on the roadmap to ensure flexibility and future-proofing.
 
-| Provider | Supported Models | Required Configuration | Notes |
-|----------|------------------|------------------------|-------|
-| OpenAI   | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo`, etc. | `api_key`, `model`, `url` (optional) | Default provider. Requires a valid OpenAI API key. |
-| Anthropic | - | - | Coming soon. |
+| Provider | Supported Models | Required Configuration | Status |
+| --- | --- | --- | --- |
+| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo` | `api_key`, `model`, `url` (optional) | ✅ Supported (default) |
+| **DeepSeek** | Coming Soon | - | 🔜 Planned |
+| **Grok (xAI)** | Coming Soon | - | 🔜 Planned |
+| **Gemini (Google)** | Coming Soon | - | 🔜 Planned |
+| **Others** | - | - | 🧪 Under consideration |
+> ℹ️ We're actively working on supporting multiple AI backends to give you more control, flexibility, and performance. Have a provider you'd like to see? [Open a discussion](https://github.com/rezatg/gitc/discussions)!
 
 ## 🤝 Contributing
 
