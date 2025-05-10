@@ -67,7 +67,7 @@ gitc streamlines your Git workflow by automating professional commit message cre
   3. Move to `/usr/local/bin`
 
 - ### Verify Installation
-  - After installation, verify the tool is installed correctly and check its version:
+  After installation, verify the tool is installed correctly and check its version:
   ```bash
   gitc --version
   ```
