@@ -19,13 +19,36 @@
   <a href="#-full-options">Full Options</a> •
   <a href="#-ai-providers">AI Providers</a>
 </div>
-
-**gitc** is a lightweight, AI-powered command-line tool that turns your Git diffs into clear, consistent, and standards-compliant commit messages. With support for [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and custom conventions, `gitc` helps individuals and teams boost productivity and maintain cleaner commit history.
-
 <br>
-<div align="center">
-  <img src="https://github.com/rezatg/gitc/blob/master/assets/demo.png" alt="demo" style="height: auto;border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-</div>
+
+> `gitc` is a fast, lightweight CLI tool that uses AI to generate clear, consistent, and standards-compliant commit messages — directly from your Git diffs. With built-in support for [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and fully customizable rules, `gitc` helps you and your team write better commits, faster
+
+## 🚀 Features
+gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
+
+- ### 🧠 AI and Commit Generation
+  - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
+  - **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
+  - **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
+
+- ### 📝 Commit Standards and Customization
+  - **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
+  - **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
+  - **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
+
+- ### 🔧 Git Integration
+  - **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
+  - **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
+
+- ### ⚙️ Configuration & Environment
+  - **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
+  - **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
+  - **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
+  - **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
+
+- ### ⚡️ Performance & Reliability
+  - **Fast Processing**: Leverages [sonic](https://github.com/bytedance/sonic) for rapid JSON parsing and [fasthttp](https://github.com/valyala/fasthttp) for efficient HTTP requests.
+  - **Error Handling**: Robust validation and error messages ensure reliable operation.
 
 ## 📦 Installation
 ### Prerequisites:
@@ -68,32 +91,9 @@ gitc --commit-type fix
 gitc --version
 ```
 
-## 🚀 Features
-gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
+## 🚀 See It in Action
+<div align="center"> <img src="https://github.com/rezatg/gitc/blob/master/assets/demo.png" alt="gitc demo" style="height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top: 10px;"> </div>
 
-- ### 🧠 AI and Commit Generation
-  - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
-  - **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
-  - **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
-
-- ### 📝 Commit Standards and Customization
-  - **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
-  - **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
-  - **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
-
-- ### 🔧 Git Integration
-  - **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
-  - **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
-
-- ### ⚙️ Configuration & Environment
-  - **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
-  - **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
-  - **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
-  - **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
-
-- ### ⚡️ Performance & Reliability
-  - **Fast Processing**: Leverages [sonic](https://github.com/bytedance/sonic) for rapid JSON parsing and [fasthttp](https://github.com/valyala/fasthttp) for efficient HTTP requests.
-  - **Error Handling**: Robust validation and error messages ensure reliable operation.
 
 ## Environment Variables
 ```bash
@@ -102,7 +102,7 @@ export GITC_LANGUAGE="fa"
 export GITC_MODEL="gpt-4"
 ```
 
-# ⚙️ Configuration
+## ⚙️ Configuration
 Config File (`~/.gitc/config.json`) :
 ```json
 {
