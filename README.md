@@ -51,22 +51,22 @@ gitc streamlines your Git workflow by automating professional commit message cre
   - **Error Handling**: Robust validation and error messages ensure reliable operation.
 
 ## 📦 Installation
-- ### Prerequisites:
+### Prerequisites:
   - Go: Version **1.18** or higher (required for building from source).
   - Git: Required for retrieving staged changes.
   - OpenAI API Key: Required for AI-powered commit message generation. Set it via the `AI_API_KEY` environment variable or in the config file.
 
-- #### Quick Install:
+#### Quick Install:
   ```bash
   go install github.com/rezatg/gitc@latest
   ```
 
-- ### Manual Install
+### Manual Install
   1. Download binary from [releases](https://github.com/rezatg/gitc/releases)
   2. `chmod +x gitc`
   3. Move to `/usr/local/bin`
 
-- ### Verify Installation
+### Verify Installation
   After installation, verify the tool is installed correctly and check its version:
   ```bash
   gitc --version
