@@ -4,6 +4,13 @@
 
 # ✨ gitc - AI-Powered Git Commit Messages
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/rezatg/gitc)](https://pkg.go.dev/github.com/rezatg/gitc)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/rezatg/gitc?logo=go)](go.mod)
+[![Sourcegraph](https://sourcegraph.com/github.com/rezatg/gitc/-/badge.svg)](https://sourcegraph.com/github.com/rezatg/gitc?badge)
+[![Discussions](https://img.shields.io/github/discussions/rezatg/gitc?color=58a6ff&label=Discussions&logo=github)](https://github.com/rezatg/gitc/discussions)
+[![Downloads](https://img.shields.io/github/downloads/rezatg/gitc/total?color=blue)](https://github.com/rezatg/gitc/releases)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 <div align="center">
   <a href="#-installation">Installation</a> •
   <a href="#-features">Features</a> •
@@ -13,46 +20,12 @@
   <a href="#-ai-providers">AI Providers</a>
 </div>
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/rezatg/gitc)](https://pkg.go.dev/github.com/rezatg/gitc)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/rezatg/gitc?logo=go)](go.mod)
-[![Sourcegraph](https://sourcegraph.com/github.com/rezatg/gitc/-/badge.svg)](https://sourcegraph.com/github.com/rezatg/gitc?badge)
-[![Discussions](https://img.shields.io/github/discussions/rezatg/gitc?color=58a6ff&label=Discussions&logo=github)](https://github.com/rezatg/gitc/discussions)
-[![Downloads](https://img.shields.io/github/downloads/rezatg/gitc/total?color=blue)](https://github.com/rezatg/gitc/releases)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-
-**AI-Commit is a command-line tool that leverages AI to generate professional Git commit messages based on staged changes. It supports Conventional Commits, Gitmoji, and customizable commit message conventions, making it ideal for developers who want to streamline their commit workflow. Powered by OpenAI, it analyzes your git diff and produces clear, concise, and context-aware commit messages.**
+**gitc** is a lightweight, AI-powered command-line tool that turns your Git diffs into clear, consistent, and standards-compliant commit messages. With support for [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and custom conventions, `gitc` helps individuals and teams boost productivity and maintain cleaner commit history.
 
 <br>
 <div align="center">
   <img src="https://github.com/rezatg/gitc/blob/master/assets/demo.png" alt="demo" style="height: auto;border-radius: 5px;box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </div>
-
-## 🚀 Features
-gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
-
-### AI and Commit Generation
-- **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
-- **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
-- **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
-
-### Commit Standards and Customization
-- **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
-- **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
-- **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
-
-### Git Integration
-- **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
-- **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
-
-### Configuration and Networking
-- **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
-- **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
-- **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
-- **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
-
-### Performance and Reliability
-- **Fast Processing**: Leverages `sonic` for rapid JSON parsing and `fasthttp` for efficient HTTP requests.
-- **Error Handling**: Robust validation and error messages ensure reliable operation.
 
 ## 📦 Installation
 ### Prerequisites:
@@ -90,7 +63,38 @@ gitc --emoji --lang fa
 
 # Custom commit type
 gitc --commit-type fix
+
+# Display tool version
+gitc --version
 ```
+
+## 🚀 Features
+gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
+
+### 🧠 AI and Commit Generation
+- **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
+- **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
+- **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
+
+### 📝 Commit Standards and Customization
+- **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
+- **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
+- **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
+
+### 🔧 Git Integration
+- **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
+- **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
+
+### ⚙️ Configuration & Environment
+- **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
+- **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
+- **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
+- **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
+
+### ⚡️ Performance & Reliability
+- **Fast Processing**: Leverages [sonic](https://github.com/bytedance/sonic) for rapid JSON parsing and [fasthttp](https://github.com/valyala/fasthttp) for efficient HTTP requests.
+- **Error Handling**: Robust validation and error messages ensure reliable operation.
+
 ## Environment Variables
 ```bash
 export OPENAI_API_KEY="sk-your-key-here"
@@ -140,9 +144,11 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 
 ### Notes:
 - Flags for the `config` subcommand are similar but exclude defaults, as they override the config file.
+- **Flags** > **Environment Variables** > **Config File** — This is the order of precedence when multiple settings are provided.
 - The `--custom-convention` flag expects a JSON string with a `prefix` field (e.g., `{"prefix": "JIRA-123"}`).
+- The `--version` flag displays the current tool version (e.g., `0.1.0`) and can be used to verify installation.
+- The `--all` flag (alias `-a`) stages all changes in the working directory before generating the commit message, streamlining the workflow. For example, `gitc -a --emoji` stages all changes and generates a commit message with Gitmoji.
 - Environment variables take precedence over config file settings but are overridden by CLI flags.
-
 
 ## 🤖 AI Providers
 Currently, `ai-commit` supports the following AI providers. Additional providers (e.g., Anthropic) are planned for future releases.
@@ -151,3 +157,10 @@ Currently, `ai-commit` supports the following AI providers. Additional providers
 |----------|------------------|------------------------|-------|
 | OpenAI   | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo`, etc. | `api_key`, `model`, `url` (optional) | Default provider. Requires a valid OpenAI API key. |
 | Anthropic | - | - | Coming soon. |
+
+## 🤝 Contributing
+
+We welcome contributions! Please check out the [contributing guide](CONTRIBUTING.md) before making a PR.
+
+## ⭐️ Star History
+[![Star History Chart](https://api.star-history.com/svg?repos=rezatg/gitc&type=Date)](https://www.star-history.com/#rezatg/gitc&Date)
