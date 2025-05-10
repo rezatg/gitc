@@ -2,6 +2,7 @@ package openai
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,7 +13,10 @@ import (
 	"github.com/valyala/fasthttp/fasthttpproxy"
 )
 
-const defaultOpenAIURL = "https://api.openai.com/v1/chat/completions"
+const (
+	defaultOpenAIURL = "https://api.openai.com/v1/chat/completions"
+	systemPrompt     = "You are an AI assistant that generates Git commit messages."
+)
 
 // OpenAIProvider implements the AIProvider interface for OpenAI
 type OpenAIProvider struct {
@@ -46,9 +50,8 @@ type Message struct {
 // NewOpenAIProvider creates a new OpenAI provider
 func NewOpenAIProvider(apiKey, proxy, url string) (*OpenAIProvider, error) {
 	if apiKey == "" {
-		return nil, fmt.Errorf("API key is required")
+		return nil, errors.New("API key is required")
 	}
-
 	if url == "" {
 		url = defaultOpenAIURL
 	}
@@ -76,7 +79,7 @@ func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string,
 		Model: opts.Model,
 		// Store: false,
 		Messages: []Message{
-			{"system", "You are an AI assistant that generates Git commit messages."},
+			{"system", systemPrompt},
 			{"user", prompt},
 		},
 		MaxTokens:   max(512, opts.MaxLength), // More tokens for complete messages
@@ -120,14 +123,14 @@ func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string,
 	if res.Error.Message != "" {
 		return "", fmt.Errorf("API error: %s", res.Error.Message)
 	} else if len(res.Choices) == 0 {
-		return "", fmt.Errorf("no response from OpenAI")
+		return "", errors.New("no response from OpenAI")
 	}
 
 	commitMessage := strings.TrimSpace(res.Choices[0].Message.Content)
 
 	// Ensure message is not empty
 	if commitMessage == "" {
-		return "", fmt.Errorf("empty commit message generated")
+		return "", errors.New("empty commit message generated")
 	}
 
 	// if len(commitMessage) > opts.MaxLength {
