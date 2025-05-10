@@ -71,29 +71,29 @@ gitc --version
 ## 🚀 Features
 gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
 
-### 🧠 AI and Commit Generation
-- **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
-- **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
-- **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
+- ### 🧠 AI and Commit Generation
+  - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
+  - **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
+  - **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
 
-### 📝 Commit Standards and Customization
-- **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
-- **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
-- **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
+- ### 📝 Commit Standards and Customization
+  - **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
+  - **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
+  - **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
 
-### 🔧 Git Integration
-- **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
-- **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
+- ### 🔧 Git Integration
+  - **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
+  - **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
 
-### ⚙️ Configuration & Environment
-- **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
-- **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
-- **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
-- **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
+- ### ⚙️ Configuration & Environment
+  - **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
+  - **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
+  - **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
+  - **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
 
-### ⚡️ Performance & Reliability
-- **Fast Processing**: Leverages [sonic](https://github.com/bytedance/sonic) for rapid JSON parsing and [fasthttp](https://github.com/valyala/fasthttp) for efficient HTTP requests.
-- **Error Handling**: Robust validation and error messages ensure reliable operation.
+- ### ⚡️ Performance & Reliability
+  - **Fast Processing**: Leverages [sonic](https://github.com/bytedance/sonic) for rapid JSON parsing and [fasthttp](https://github.com/valyala/fasthttp) for efficient HTTP requests.
+  - **Error Handling**: Robust validation and error messages ensure reliable operation.
 
 ## Environment Variables
 ```bash
