@@ -23,7 +23,7 @@
 
 > `gitc` is a fast, lightweight CLI tool that uses AI to generate clear, consistent, and standards-compliant commit messages — directly from your Git diffs. With built-in support for [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and fully customizable rules, `gitc` helps you and your team write better commits, faster
 
-## 🚀 Features
+# 🚀 Features
 gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
 
 - ### 🧠 AI and Commit Generation
@@ -40,7 +40,7 @@ gitc streamlines your Git workflow by automating professional commit message cre
   - **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
   - **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
 
-- ### ⚙️ Configuration & Environment
+- ### ⚙️ Environment & Configuration
   - **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
   - **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
   - **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
@@ -102,7 +102,7 @@ export GITC_LANGUAGE="fa"
 export GITC_MODEL="gpt-4"
 ```
 
-## ⚙️ Configuration
+# ⚙️ Configuration
 Config File (`~/.gitc/config.json`) :
 ```json
 {
@@ -123,7 +123,7 @@ Config File (`~/.gitc/config.json`) :
 }
 ```
 
-## 📚 Full Options
+# 📚 Full Options
 The following CLI flags are available for the `ai-commit` command and its `config` subcommand. All flags can also be set via environment variables or the `~/.gitc/config.json` file.
 
 | Flag | Alias | Description | Default | Environment Variable | Example |
