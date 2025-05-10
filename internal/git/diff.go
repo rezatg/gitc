@@ -27,33 +27,15 @@ func NewGitService(excludeFiles ...string) GitService {
 	}
 }
 
-// Default exclude files and patterns
+// defaultExcludeFiles defines common files and folders to ignore in git diffs
 var defaultExcludeFiles = []string{
-	"package-lock.json",
-	"pnpm-lock.yaml",
-	"yarn.lock",
-	"*.lock",
-	"*.min.js",
-	"*.bundle.js",
-	"node_modules/*",
-	"dist/*",
-	"build/*",
-	"*.png",
-	"*.jpg",
-	"*.jpeg",
-	"*.gif",
-	"*.svg",
-	"*.ico",
-	"*.woff",
-	"*.woff2",
-	"*.ttf",
-	"*.eot",
-	"*.pdf",
-	"*.zip",
-	"*.gz",
-	"*.log",
-	"*.bak",
-	"*.swp",
+	"package-lock.json", "pnpm-lock.yaml", "yarn.lock", "*.lock",
+	"*.min.js", "*.bundle.js",
+	"node_modules/*", "dist/*", "build/*",
+	"*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg", "*.ico",
+	"*.woff", "*.woff2", "*.ttf", "*.eot",
+	"*.pdf", "*.zip", "*.gz",
+	"*.log", "*.bak", "*.swp",
 }
 
 // GetDiff retrieves the git diff for staged changes
@@ -64,20 +46,22 @@ func (g *gitServiceImpl) GetDiff(ctx context.Context) (string, error) {
 // getGitRoot retrieves the root directory of the git repository
 func getGitRoot() (string, error) {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &out
 	if err := cmd.Run(); err != nil {
 		return "", fmt.Errorf("not a git repository: %w", err)
 	}
+
 	return strings.TrimSpace(out.String()), nil
 }
 
 // getExcludeFileArgs converts exclude paths into git diff exclude args
 func getExcludeFileArgs(excludeFiles []string) []string {
-	args := make([]string, 0, len(excludeFiles))
-	for _, f := range excludeFiles {
-		args = append(args, fmt.Sprintf(":(exclude)%s", f))
+	args := make([]string, len(excludeFiles))
+	for i, f := range excludeFiles {
+		args[i] = fmt.Sprintf(":(exclude)%s", f)
 	}
 	return args
 }
@@ -89,34 +73,27 @@ func processDiff(diff string) string {
 	inHunk := false
 
 	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
 			continue
 		}
 
-		// Skip non-informative lines
-		if strings.HasPrefix(line, "index ") ||
-			strings.HasPrefix(line, "--- ") ||
-			strings.HasPrefix(line, "+++ ") {
+		switch {
+		case strings.HasPrefix(trimmed, "index "),
+			strings.HasPrefix(trimmed, "--- "),
+			strings.HasPrefix(trimmed, "+++ "):
 			continue
-		}
-
-		// Skip unchanged context lines
-		if strings.HasPrefix(line, " ") && inHunk {
-			continue
-		}
-
-		// Simplify hunk headers
-		if strings.HasPrefix(line, "@@") {
+		case strings.HasPrefix(trimmed, "@@"):
 			inHunk = true
-			parts := strings.SplitN(line, "@@", 3)
+			parts := strings.SplitN(trimmed, "@@", 3)
 			if len(parts) >= 3 {
-				line = "@@" + strings.TrimSpace(parts[2])
+				builder.WriteString("@@" + strings.TrimSpace(parts[2]) + "\n")
 			}
+		case strings.HasPrefix(trimmed, " ") && inHunk:
+			continue
+		default:
+			builder.WriteString(trimmed + "\n")
 		}
-
-		builder.WriteString(line)
-		builder.WriteString("\n")
 	}
 
 	return strings.TrimSpace(builder.String())
@@ -172,7 +149,6 @@ func GetDiffStaged(ctx context.Context, extraExcludeFiles []string) (string, err
 }
 
 // StageAll stages all changes in the working directory (equivalent to 'git add .').
-// It respects the provided context for cancellation and timeouts.
 func (s *gitServiceImpl) StageAll(ctx context.Context) error {
 	cmd := exec.CommandContext(ctx, "git", "add", ".")
 	if output, err := cmd.CombinedOutput(); err != nil {

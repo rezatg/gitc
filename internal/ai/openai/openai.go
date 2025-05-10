@@ -130,9 +130,9 @@ func (p *OpenAIProvider) GenerateCommitMessage(ctx context.Context, diff string,
 		return "", fmt.Errorf("empty commit message generated")
 	}
 
-	if len(commitMessage) > opts.MaxLength {
-		commitMessage = commitMessage[:opts.MaxLength]
-	}
+	// if len(commitMessage) > opts.MaxLength {
+	// 	commitMessage = commitMessage[:opts.MaxLength]
+	// }
 
 	return commitMessage, nil
 }
