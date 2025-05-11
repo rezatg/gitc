@@ -6,6 +6,8 @@ go.work.sum
 .env
 
 .git
+
+/build
 gitc
 
 # config file
