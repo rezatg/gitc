@@ -88,10 +88,6 @@ gitc --emoji --lang fa
 gitc --commit-type fix
 ```
 
-## 🚀 See It in Action
-<div align="center"> <img src="https://github.com/rezatg/gitc/blob/master/assets/demo.png" alt="gitc demo" style="height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top: 10px;"> </div>
-
-
 ## Environment Variables
 ```bash
 export OPENAI_API_KEY="sk-your-key-here"
