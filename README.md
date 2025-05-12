@@ -10,6 +10,7 @@
 [![Discussions](https://img.shields.io/github/discussions/rezatg/gitc?color=58a6ff&label=Discussions&logo=github)](https://github.com/rezatg/gitc/discussions)
 [![Downloads](https://img.shields.io/github/downloads/rezatg/gitc/total?color=blue)](https://github.com/rezatg/gitc/releases)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/rezatg/gitc)
 
 <div align="center">
   <a href="#-installation">Installation</a> •
