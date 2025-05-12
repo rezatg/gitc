@@ -135,16 +135,19 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 | `--commit-type` | `-t` | Commit type for Conventional Commits (e.g., `feat`, `fix`) | - | `GITC_COMMIT_TYPE` | `--commit-type feat` |
 | `--custom-convention` | `-C` | Custom commit message convention (JSON format) | - | `GITC_CUSTOM_CONVENTION` | `--custom-convention '{"prefix": "JIRA-123"}'` |
 | `--emoji` | `-g` | Add Gitmoji to the commit message | `false` | `GITC_GITMOJI` | `--emoji` |
+| `--no-emoji` | - | Disables Gitmoji in commit messages (overrides `--emoji` and config file) | `false` | - | `--no-emoji`
 | `--max-redirects` | `-r` | Maximum number of HTTP redirects | `5` | `GITC_MAX_REDIRECTS` | `--max-redirects 10` |
 | `--config` | `-c` | Path to the configuration file | `~/.gitc/config.json` | `GITC_CONFIG_PATH` | `--config ./my-config.json` |
 
-### Notes:
-- Flags for the `config` subcommand are similar but exclude defaults, as they override the config file.
-- **Flags** > **Environment Variables** > **Config File** — This is the order of precedence when multiple settings are provided.
-- The `--custom-convention` flag expects a JSON string with a `prefix` field (e.g., `{"prefix": "JIRA-123"}`).
-- The `--version` flag displays the current tool version (e.g., `0.1.0`) and can be used to verify installation.
-- The `--all` flag (alias `-a`) stages all changes in the working directory before generating the commit message, streamlining the workflow. For example, `gitc -a --emoji` stages all changes and generates a commit message with Gitmoji.
-- Environment variables take precedence over config file settings but are overridden by CLI flags.
+> [!NOTE]
+> - Flags for the `config` subcommand are similar but exclude defaults, as they override the config file.
+> - **Flags** > **Environment Variables** > **Config File** — This is the order of precedence when multiple settings are provided.
+> - The `--custom-convention` flag expects a JSON string with a `prefix` field (e.g., `{"prefix": "JIRA-123"}`).
+> - The `--version` flag displays the current tool version (e.g., `0.1.0`) and can be used to verify installation.
+> - The `--all` flag (alias `-a`) stages all changes in the working directory before generating the commit message, streamlining the workflow. For example, `gitc -a --emoji` stages all changes and generates a commit message with Gitmoji.
+> - Environment variables take precedence over config file settings but are overridden by CLI flags.
+> - You can reset all configuration values to their defaults by using gitc config `gitc reset-config`.
+
 
 ## 🤖 AI Providers
 `gitc` is designed to be AI-provider agnostic. While it currently supports OpenAI out of the box, support for additional providers is on the roadmap to ensure flexibility and future-proofing.

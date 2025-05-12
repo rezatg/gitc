@@ -80,6 +80,10 @@ var Commands = &cli.App{
 			Usage:   "Add Gitmoji to the commit message based on commit type",
 			EnvVars: []string{"GITC_GITMOJI"},
 		},
+		&cli.BoolFlag{
+			Name:  "no-emoji",
+			Usage: "Disable Gitmoji in the commit message (overrides --emoji)",
+		},
 		&cli.IntFlag{
 			Name:    "max-redirects",
 			Aliases: []string{"r"},
@@ -171,6 +175,10 @@ var Commands = &cli.App{
 					Aliases: []string{"g"},
 					Usage:   "Add Gitmoji to the commit message based on commit type",
 				},
+				&cli.BoolFlag{
+					Name:  "no-emoji",
+					Usage: "Disable Gitmoji in the commit message",
+				},
 				&cli.StringFlag{
 					Name:    "config",
 					Aliases: []string{"c"},
@@ -194,6 +202,17 @@ var Commands = &cli.App{
 				gitService := git.NewGitService()
 				app := NewApp(gitService, cfg)
 				return app.ConfigAction(c)
+			},
+		}, {
+			Name:  "reset-config",
+			Usage: "Reset gitc configuration to default values",
+			Action: func(c *cli.Context) error {
+				if err := config.Reset(); err != nil {
+					return fmt.Errorf("failed to reset config: %w", err)
+				}
+
+				fmt.Println("✅ Configuration reset to defaults.")
+				return nil
 			},
 		},
 	},

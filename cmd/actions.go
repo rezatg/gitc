@@ -41,7 +41,7 @@ func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 		Proxy:            c.String("proxy"),
 		CommitType:       c.String("commit-type"),
 		CustomConvention: c.String("custom-convention"),
-		UseGitmoji:       c.Bool("emoji"),
+		UseGitmoji:       !c.Bool("no-emoji") && c.Bool("emoji"),
 	}
 
 	// Apply config defaults
@@ -225,7 +225,9 @@ func (a *App) updateConfigFromFlags(cfg *config.Config, c *cli.Context) {
 	if customConvention := c.String("custom-convention"); customConvention != "" {
 		cfg.CustomConvention = customConvention
 	}
-	if c.IsSet("emoji") {
+	if c.IsSet("no-emoji") {
+		cfg.UseGitmoji = !c.Bool("no-emoji")
+	} else if c.IsSet("emoji") {
 		cfg.UseGitmoji = c.Bool("emoji")
 	}
 	if maxRedirects := c.Int("max-redirects"); c.Int("max-redirects") != 0 {

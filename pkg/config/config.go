@@ -131,3 +131,8 @@ func Save(cfg *Config) error {
 
 	return nil
 }
+
+func Reset() error {
+	defaultConfig := DefaultConfig()
+	return Save(defaultConfig)
+}
