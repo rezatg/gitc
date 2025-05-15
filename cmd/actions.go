@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/rezatg/gitc/internal/ai"
-	"github.com/rezatg/gitc/internal/ai/openai"
+	"github.com/rezatg/gitc/internal/ai/generic"
 	"github.com/rezatg/gitc/internal/git"
 	"github.com/rezatg/gitc/pkg/config"
 	"github.com/rezatg/gitc/pkg/utils"
@@ -28,7 +28,7 @@ func NewApp(gitService git.GitService, config *config.Config) *App {
 	}
 }
 
-// buildAIConfig constructs the AI configuration with proper validation
+// ConfigureAI constructs the AI configuration with proper validation
 func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 	cfg := &ai.Config{
 		Provider:         c.String("provider"),
@@ -42,6 +42,7 @@ func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 		CommitType:       c.String("commit-type"),
 		CustomConvention: c.String("custom-convention"),
 		UseGitmoji:       !c.Bool("no-emoji") && c.Bool("emoji"),
+		URL:              c.String("url"),
 	}
 
 	// Apply config defaults
@@ -55,9 +56,8 @@ func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 	return cfg, nil
 }
 
-// GenerateCommitMessage generates a commit message based on git diff and AI configuration.
+// generateCommitMessage generates a commit message based on git diff and AI configuration.
 func (a *App) generateCommitMessage(ctx context.Context, diff string, cfg *ai.Config) (string, error) {
-	// Initialize AI provider
 	provider, err := a.initAIProvider(cfg)
 	if err != nil {
 		return "", fmt.Errorf("failed to initialize AI provider: %w", err)
@@ -72,6 +72,7 @@ func (a *App) generateCommitMessage(ctx context.Context, diff string, cfg *ai.Co
 		CommitType:       cfg.CommitType,
 		CustomConvention: cfg.CustomConvention,
 		MaxLength:        cfg.MaxLength,
+		MaxRedirects:     cfg.MaxRedirects,
 	}
 
 	msg, err := provider.GenerateCommitMessage(ctx, diff, opts)
@@ -97,6 +98,7 @@ func (a *App) CommitAction(c *cli.Context) error {
 
 		fmt.Println("✅ All changes staged successfully")
 	}
+
 	// Fetch git diff for staged changes
 	diff, err := a.gitService.GetDiff(c.Context)
 	if err != nil {
@@ -124,23 +126,17 @@ func (a *App) CommitAction(c *cli.Context) error {
 
 // ConfigAction handles configuration updates
 func (a *App) ConfigAction(c *cli.Context) error {
-	// Create a copy of the current config
 	cfg := *a.config
-
-	// Update config fields from CLI flags
 	a.updateConfigFromFlags(&cfg, c)
 
-	// Validate updated config
 	if err := a.validateConfig(&cfg); err != nil {
 		return fmt.Errorf("invalid configuration: %w", err)
 	}
 
-	// Save updated config
 	if err := config.Save(&cfg); err != nil {
 		return fmt.Errorf("failed to save config: %w", err)
 	}
 
-	// Update app's config
 	a.config = &cfg
 	fmt.Println("✅ Configuration updated successfully")
 	return nil
@@ -152,10 +148,19 @@ func (a *App) applyConfigDefaults(cfg *ai.Config) {
 		cfg.Provider = a.config.Provider
 	}
 	if cfg.Model == "" {
-		cfg.Model = a.config.OpenAI.Model
+		switch cfg.Provider {
+		case "openai":
+			cfg.Model = "gpt-4o-mini"
+		case "grok":
+			cfg.Model = "grok-3"
+		case "deepseek":
+			cfg.Model = "deepseek-rag"
+		default:
+			cfg.Model = a.config.Model
+		}
 	}
 	if cfg.APIKey == "" {
-		cfg.APIKey = a.config.OpenAI.APIKey
+		cfg.APIKey = a.config.APIKey
 	}
 	if cfg.Timeout == 0 {
 		cfg.Timeout = time.Duration(a.config.Timeout) * time.Second
@@ -169,43 +174,52 @@ func (a *App) applyConfigDefaults(cfg *ai.Config) {
 	if cfg.MaxRedirects == 0 {
 		cfg.MaxRedirects = a.config.MaxRedirects
 	}
+	if cfg.URL == "" {
+		switch cfg.Provider {
+		case "openai":
+			cfg.URL = "https://api.openai.com/v1/chat/completions"
+		case "grok":
+			cfg.URL = "https://api.x.ai/v1/chat/completions"
+		case "deepseek":
+			cfg.URL = "https://api.deepseek.com/v1/chat/completions" // فرضی
+		default:
+			cfg.URL = a.config.URL
+		}
+	}
 }
 
-// validateConfig checks if the application configuration is valid.
+// initAIProvider initializes the AI provider based on the configuration.
+func (a *App) initAIProvider(cfg *ai.Config) (ai.AIProvider, error) {
+	return generic.NewGenericProvider(cfg.APIKey, cfg.Proxy, cfg.URL, cfg.Provider)
+}
+
+// validateConfig checks if the AI configuration is valid.
 func (a *App) validateConfig(cfg *config.Config) error {
-	switch {
-	case cfg.Provider == "":
+	if cfg.Provider == "" {
 		return fmt.Errorf("AI provider is required")
-	case cfg.OpenAI.APIKey == "":
+	}
+	if cfg.APIKey == "" {
 		return fmt.Errorf("API key is required")
-	case cfg.Timeout <= 0:
+	}
+	if cfg.Timeout <= 0 {
 		return fmt.Errorf("timeout must be positive")
-	case cfg.MaxLength <= 0:
+	}
+	if cfg.MaxLength <= 0 {
 		return fmt.Errorf("max length must be positive")
 	}
 	return nil
 }
 
-// initAIProvider initializes the AI provider based on the configuration.
-func (a *App) initAIProvider(cfg *ai.Config) (ai.AIProvider, error) {
-	switch cfg.Provider {
-	case "openai":
-		return openai.NewOpenAIProvider(cfg.APIKey, cfg.Proxy, a.config.OpenAI.URL)
-	default:
-		return nil, fmt.Errorf("unsupported AI provider: %s", cfg.Provider)
-	}
-}
-
-// updateConfigFromFlags updates the configuration based on CLI flags..
+// updateConfigFromFlags updates the configuration based on CLI flags.
 func (a *App) updateConfigFromFlags(cfg *config.Config, c *cli.Context) {
 	if provider := c.String("provider"); provider != "" {
 		cfg.Provider = provider
 	}
 	if model := c.String("model"); model != "" {
-		cfg.OpenAI.Model = model
+		cfg.Model = model
 	}
 	if apiKey := c.String("api-key"); apiKey != "" {
-		cfg.OpenAI.APIKey = apiKey
+		cfg.APIKey = apiKey
 	}
 	if lang := c.String("lang"); lang != "" {
 		cfg.Language = lang
@@ -230,7 +244,10 @@ func (a *App) updateConfigFromFlags(cfg *config.Config, c *cli.Context) {
 	} else if c.IsSet("emoji") {
 		cfg.UseGitmoji = c.Bool("emoji")
 	}
-	if maxRedirects := c.Int("max-redirects"); c.Int("max-redirects") != 0 {
+	if maxRedirects := c.Int("max-redirects"); maxRedirects != 0 {
 		cfg.MaxRedirects = maxRedirects
+	}
+	if url := c.String("url"); url != "" {
+		cfg.URL = url
 	}
 }

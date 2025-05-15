@@ -11,31 +11,27 @@ import (
 // Config holds the main configuration structure for the gitc CLI tool
 type Config struct {
 	Provider         string `json:"provider"`
+	APIKey           string `json:"api_key"`
+	Model            string `json:"model"`
+	URL              string `json:"url"`
 	MaxLength        int    `json:"max_length"`
 	Proxy            string `json:"proxy"`
 	Language         string `json:"language"`
 	Timeout          int    `json:"timeout"`
 	CommitType       string `json:"commit_type"`
-	CustomConvention string `json:"custom-convention"`
+	CustomConvention string `json:"custom_convention"`
 	UseGitmoji       bool   `json:"use_gitmoji"`
 	MaxRedirects     int    `json:"max_redirects"`
-
-	OpenAI OpenAI `json:"open_ai"`
-}
-
-// OpenAI holds OpenAI-specific configuration
-type OpenAI struct {
-	APIKey string `json:"api_key"`
-	Model  string `json:"model"`
-	URL    string `json:"url"`
 }
 
 // DefaultConfig returns a default config with fallback values
-// This will be used if no config file is found or fields are missing
 func DefaultConfig() *Config {
 	return &Config{
 		Provider:         "openai",
-		MaxLength:        200,
+		APIKey:           os.Getenv("AI_API_KEY"),
+		Model:            "gpt-4o-mini",
+		URL:              "https://api.openai.com/v1/chat/completions",
+		MaxLength:        250,
 		Proxy:            "",
 		Language:         "en",
 		Timeout:          10,
@@ -43,12 +39,6 @@ func DefaultConfig() *Config {
 		CustomConvention: "",
 		UseGitmoji:       false,
 		MaxRedirects:     5,
-
-		OpenAI: OpenAI{
-			APIKey: os.Getenv("AI_API_KEY"), // Load from env if available
-			Model:  "gpt-4o-mini",
-			URL:    "",
-		},
 	}
 }
 
@@ -62,8 +52,6 @@ func SetConfigPath(path string) {
 
 // Load loads the configuration from file or creates a default one if it doesn't exist
 func Load() (*Config, error) {
-	fmt.Println(configPath)
-	// Resolve absolute path to ensure consistency
 	absPath, err := filepath.Abs(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve config path: %w", err)
@@ -71,12 +59,10 @@ func Load() (*Config, error) {
 
 	data, err := os.ReadFile(absPath)
 	if os.IsNotExist(err) {
-		// Create default config file if it doesn't exist
 		cfg := DefaultConfig()
 		if err := Save(cfg); err != nil {
 			return nil, fmt.Errorf("failed to create default config: %w", err)
 		}
-
 		return cfg, nil
 	} else if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
@@ -92,6 +78,33 @@ func Load() (*Config, error) {
 	if cfg.Provider == "" {
 		cfg.Provider = defaults.Provider
 	}
+	if cfg.APIKey == "" {
+		cfg.APIKey = defaults.APIKey
+	}
+	if cfg.Model == "" {
+		switch cfg.Provider {
+		case "openai":
+			cfg.Model = "gpt-4o-mini"
+		case "grok":
+			cfg.Model = "grok-3"
+		case "deepseek":
+			cfg.Model = "deepseek-rag"
+		default:
+			cfg.Model = defaults.Model
+		}
+	}
+	if cfg.URL == "" {
+		switch cfg.Provider {
+		case "openai":
+			cfg.URL = "https://api.openai.com/v1/chat/completions"
+		case "grok":
+			cfg.URL = "https://api.x.ai/v1/chat/completions"
+		case "deepseek":
+			cfg.URL = "https://api.deepseek.com/v1/chat/completions"
+		default:
+			cfg.URL = defaults.URL
+		}
+	}
 	if cfg.MaxLength == 0 {
 		cfg.MaxLength = defaults.MaxLength
 	}
@@ -101,11 +114,8 @@ func Load() (*Config, error) {
 	if cfg.Timeout == 0 {
 		cfg.Timeout = defaults.Timeout
 	}
-	if cfg.OpenAI.Model == "" {
-		cfg.OpenAI.Model = defaults.OpenAI.Model
-	}
-	if cfg.OpenAI.APIKey == "" {
-		cfg.OpenAI.APIKey = defaults.OpenAI.APIKey
+	if cfg.MaxRedirects == 0 {
+		cfg.MaxRedirects = defaults.MaxRedirects
 	}
 
 	return &cfg, nil
@@ -113,7 +123,6 @@ func Load() (*Config, error) {
 
 // Save saves the configuration to file
 func Save(cfg *Config) error {
-	// Resolve absolute path
 	absPath, err := filepath.Abs(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to resolve config path: %w", err)
@@ -127,7 +136,7 @@ func Save(cfg *Config) error {
 	data, err := sonic.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal config: %w", err)
-	} else if err := os.WriteFile(configPath, data, 0600); err != nil {
+	} else if err := os.WriteFile(absPath, data, 0600); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
@@ -136,11 +145,10 @@ func Save(cfg *Config) error {
 
 // Reset overwrites the config file with default values
 func Reset() error {
-	defaultConfig := DefaultConfig()
-	return Save(defaultConfig)
+	return Save(DefaultConfig())
 }
 
-// userHomeDir gets the current user's home directory (used for config path)
+// userHomeDir gets the current user's home directory
 func userHomeDir() string {
 	home, err := os.UserHomeDir()
 	if err != nil {

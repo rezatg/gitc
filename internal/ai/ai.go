@@ -14,6 +14,7 @@ type AIProvider interface {
 type Config struct {
 	Provider         string
 	APIKey           string
+	URL              string
 	Timeout          time.Duration
 	MaxLength        int
 	Model            string
