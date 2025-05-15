@@ -159,8 +159,8 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 | Provider | Supported Models | Required Configuration | Status |
 | --- | --- | --- | --- |
 | **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo` | `api_key`, `model`, `url` (optional) | ✅ Supported (default) |
-| **Grok (xAI)** | grok-3 (experimental) | `api_key`, `model`, `url` | 🔜 Planned |
-| **DeepSeek** | deepseek-rag (experimental) | `api_key`, `model`, `url` | 🔜 Planned |
+| **Grok (xAI)** | grok-3 (experimental) | `api_key`, `model`, `url` | 🧪 Experimental Support |
+| **DeepSeek** | deepseek-rag (experimental) | `api_key`, `model`, `url` | 🧪 Experimental Support |
 | **Gemini (Google)** | Coming Soon | - | 🔜 Planned |
 | **Others** | - | - | 🧪 Under consideration |
 > ℹ️ We're actively working on supporting multiple AI backends to give you more control, flexibility, and performance. Have a provider you'd like to see? [Open a discussion](https://github.com/rezatg/gitc/discussions)!
