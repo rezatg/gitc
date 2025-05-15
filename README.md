@@ -25,7 +25,7 @@
 > `gitc` is a fast, lightweight CLI tool that uses AI to generate clear, consistent, and standards-compliant commit messages — directly from your Git diffs. With built-in support for [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and fully customizable rules, `gitc` helps you and your team write better commits, faster
 
 # 🚀 Features
-gitc streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
+`gitc` streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
 
 - ### 🧠 AI and Commit Generation
   - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
@@ -116,6 +116,12 @@ Config File (`~/.gitc/config.json`) :
 }
 ```
 
+### Update Configuration
+```bash
+gitc config --api-key "sk-your-key-here" --model "gpt-4o-mini" --lang en
+```
+
+
 # 📚 Full Options
 The following CLI flags are available for the `ai-commit` command and its `config` subcommand. All flags can also be set via environment variables or the `~/.gitc/config.json` file.
 
@@ -123,6 +129,7 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 |------|-------|-------------|---------|----------------------|---------|
 | `--all` | `-a` | Stage all changes before generating commit message (equivalent to `git add .`) | `false` | `GITC_STAGE_ALL` | `-all` or `-a`
 | `--provider` | - | AI provider to use (e.g., `openai`, `anthropic`) | `openai` | `AI_PROVIDER` | `--provider openai` |
+| `--url` | `-u` | Custom API URL for the AI provider | Provider-specific | `GITC_API_URL` | `--url https://api.x.ai/v1/chat/completions`
 | `--model` | - | OpenAI model for commit message generation | `gpt-4o-mini` | - | `--model gpt-4o` |
 | `--lang` | - | Language for commit messages (e.g., `en`, `fa`, `ru`) | `en` | `GITC_LANGUAGE` | `--lang fa` |
 | `--timeout` | - | Request timeout in seconds | `10` | - | `--timeout 15` |
@@ -140,7 +147,7 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 > - Flags for the `config` subcommand are similar but exclude defaults, as they override the config file.
 > - **Flags** > **Environment Variables** > **Config File** — This is the order of precedence when multiple settings are provided.
 > - The `--custom-convention` flag expects a JSON string with a `prefix` field (e.g., `{"prefix": "JIRA-123"}`).
-> - The `--version` flag displays the current tool version (e.g., `0.1.0`) and can be used to verify installation.
+> - The `--version` flag displays the current tool version (e.g., `0.2.0`) and can be used to verify installation.
 > - The `--all` flag (alias `-a`) stages all changes in the working directory before generating the commit message, streamlining the workflow. For example, `gitc -a --emoji` stages all changes and generates a commit message with Gitmoji.
 > - Environment variables take precedence over config file settings but are overridden by CLI flags.
 > - You can reset all configuration values to their defaults by using gitc config `gitc reset-config`.
@@ -152,8 +159,8 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 | Provider | Supported Models | Required Configuration | Status |
 | --- | --- | --- | --- |
 | **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo` | `api_key`, `model`, `url` (optional) | ✅ Supported (default) |
-| **DeepSeek** | Coming Soon | - | 🔜 Planned |
-| **Grok (xAI)** | Coming Soon | - | 🔜 Planned |
+| **Grok (xAI)** | grok-3 (experimental) | `api_key`, `model`, `url` | 🔜 Planned |
+| **DeepSeek** | deepseek-rag (experimental) | `api_key`, `model`, `url` | 🔜 Planned |
 | **Gemini (Google)** | Coming Soon | - | 🔜 Planned |
 | **Others** | - | - | 🧪 Under consideration |
 > ℹ️ We're actively working on supporting multiple AI backends to give you more control, flexibility, and performance. Have a provider you'd like to see? [Open a discussion](https://github.com/rezatg/gitc/discussions)!
