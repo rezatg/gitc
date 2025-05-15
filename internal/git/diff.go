@@ -32,10 +32,10 @@ var defaultExcludeFiles = []string{
 	"package-lock.json", "pnpm-lock.yaml", "yarn.lock", "*.lock",
 	"*.min.js", "*.bundle.js",
 	"node_modules/*", "dist/*", "build/*",
-	"*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg", "*.ico",
-	"*.woff", "*.woff2", "*.ttf", "*.eot",
-	"*.pdf", "*.zip", "*.gz",
 	"*.log", "*.bak", "*.swp",
+	// "*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg", "*.ico",
+	// "*.woff", "*.woff2", "*.ttf", "*.eot",
+	// "*.pdf", "*.zip", "*.gz",
 }
 
 // GetDiff retrieves the git diff for staged changes
