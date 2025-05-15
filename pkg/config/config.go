@@ -8,7 +8,7 @@ import (
 	"github.com/bytedance/sonic"
 )
 
-// Config holds application configuration
+// Config holds the main configuration structure for the gitc CLI tool
 type Config struct {
 	Provider         string `json:"provider"`
 	MaxLength        int    `json:"max_length"`
@@ -30,7 +30,8 @@ type OpenAI struct {
 	URL    string `json:"url"`
 }
 
-// DefaultConfig returns a configuration with default values
+// DefaultConfig returns a default config with fallback values
+// This will be used if no config file is found or fields are missing
 func DefaultConfig() *Config {
 	return &Config{
 		Provider:         "openai",
@@ -51,8 +52,8 @@ func DefaultConfig() *Config {
 	}
 }
 
-// configPath is set to config.json in the project root
-var configPath = "./config.json"
+// configPath points to ~/.gitc/config.json by default (hidden config file)
+var configPath = filepath.Join(userHomeDir(), ".gitc", "config.json")
 
 // SetConfigPath updates the configuration file path
 func SetConfigPath(path string) {
@@ -61,6 +62,7 @@ func SetConfigPath(path string) {
 
 // Load loads the configuration from file or creates a default one if it doesn't exist
 func Load() (*Config, error) {
+	fmt.Println(configPath)
 	// Resolve absolute path to ensure consistency
 	absPath, err := filepath.Abs(configPath)
 	if err != nil {
@@ -132,7 +134,17 @@ func Save(cfg *Config) error {
 	return nil
 }
 
+// Reset overwrites the config file with default values
 func Reset() error {
 	defaultConfig := DefaultConfig()
 	return Save(defaultConfig)
+}
+
+// userHomeDir gets the current user's home directory (used for config path)
+func userHomeDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic("cannot determine user home directory: " + err.Error())
+	}
+	return home
 }
