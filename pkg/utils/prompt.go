@@ -11,30 +11,30 @@ func GetPromptForSingleCommit(diff, commitType, customMessageConvention, languag
 		language = "en"
 	}
 
-	return fmt.Sprintf(`Generate a Git commit message in %s for the following diff:
+	return fmt.Sprintf(`Write a concise Git commit message in %s based on this diff:
 
-%s
+	%s
 
-Rules:
-- Format:
-  Line 1: <type>: <short summary> (max 50 characters, no emoji, no continuation)
-  Line 2: blank
-  Line 3+: (optional) short explanation, max 100 chars per line
+	Format:
+	Line 1: <type>: <summary> (≤50 chars)
+	Line 2: (blank)
+	Line 3+: (optional) details (≤100 chars per line)
 
-- Use imperative mood (e.g., Add, Fix, Refactor), no past tense
-- Be concise and clear
-- %s
-- %s
-- Output must be plain text. No quotes, no Markdown, no emoji, no explanations.
+	Rules:
+	- Use imperative mood (e.g. Add, Fix, Refactor)
+	- Be clear and specific
+	- %s
+	- %s
+	- No emoji, quotes, Markdown, or explanations
 
-Examples:
-feat: add JWT middleware
+	Examples:
+	feat: add JWT middleware
 
-Add access token verification to protected routes.
+	Add access token check to protected routes.
 
-fix: prevent nil pointer on DB init
+	fix: prevent crash on nil DB config
 
-Add nil check before using DB config to avoid panic.`,
+	Add nil check before DB usage.`,
 		language,
 		diff,
 		getTypeInstruction(commitType),

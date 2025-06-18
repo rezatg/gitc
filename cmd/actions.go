@@ -120,7 +120,25 @@ func (a *App) CommitAction(c *cli.Context) error {
 	}
 
 	fmt.Println("✅ Commit message generated. You can now run:")
-	fmt.Printf("   git commit -m \"%s\"\n", strings.ReplaceAll(msg, "\n", ""))
+	lines := strings.Split(msg, "\n")
+
+	if len(lines) == 1 {
+		fmt.Printf("   git commit -m \"%s\"\n", strings.TrimSpace(lines[0]))
+	} else {
+		fmt.Printf("   git commit -m \"%s\" \\\n", strings.TrimSpace(lines[0]))
+		for i, line := range lines[1:] {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+
+			if i < len(lines[1:])-1 {
+				fmt.Printf("      -m \"%s\" \\\n", line)
+			} else {
+				fmt.Printf("      -m \"%s\"\n", line)
+			}
+		}
+	}
 	return nil
 }
 
