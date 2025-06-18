@@ -5,36 +5,38 @@ import (
 	"strings"
 )
 
-// GetPromptForSingleCommit generates a prompt for creating a git commit message.
 func GetPromptForSingleCommit(diff, commitType, customMessageConvention, language string) string {
-	// Normalize language input
 	language = strings.ToLower(strings.TrimSpace(language))
 	if language == "" {
 		language = "en"
 	}
 
-	return fmt.Sprintf(`You're a git commit message generator. Based on this diff:
+	return fmt.Sprintf(`Generate a Git commit message in %s for the following diff:
+
 %s
 
-Generate a professional git commit message in %s following these rules:
-1. Structure the message with:
-   - First line: "<type>: <short description>" (max 50 characters)
-   - Blank line
-   - Body: Summarize key changes (max 100 characters per line)
-2. Use present tense and imperative mood (e.g., "Add", "Fix", "Update")
-3. Include specific changes (e.g., new features, configs, interfaces)
-4. %s
-5. %s
-6. Return plain text without Markdown, code blocks, or extra characters like \
-7. Do not include prefixes like "This commit" or extra explanations
+Rules:
+- Format:
+  Line 1: <type>: <short summary> (max 50 characters, no emoji, no continuation)
+  Line 2: blank
+  Line 3+: (optional) short explanation, max 100 chars per line
 
-Example output:
-feat: add new feature
+- Use imperative mood (e.g., Add, Fix, Refactor), no past tense
+- Be concise and clear
+- %s
+- %s
+- Output must be plain text. No quotes, no Markdown, no emoji, no explanations.
 
-Add feature to improve performance. Update config handling.
+Examples:
+feat: add JWT middleware
 
-Only return the commit message, no explanations.`,
-		diff, language,
+Add access token verification to protected routes.
+
+fix: prevent nil pointer on DB init
+
+Add nil check before using DB config to avoid panic.`,
+		language,
+		diff,
 		getTypeInstruction(commitType),
 		getConventionInstruction(customMessageConvention))
 }
