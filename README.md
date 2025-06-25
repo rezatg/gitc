@@ -30,7 +30,7 @@
 - ### 🧠 AI and Commit Generation
   - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
   - **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
-  - **Extensible AI Providers**: Supports OpenAI with plans for Anthropic and other providers, ensuring future-proofing.
+  - **Extensible AI Providers**: Supports OpenAI, Grok (xAI), and DeepSeek (experimental), with plans for Gemini and others, ensuring future-proofing.
 
 - ### 📝 Commit Standards and Customization
   - **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
