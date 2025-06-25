@@ -9,7 +9,7 @@ import (
 )
 
 // Version defines the current version of the gitc tool.
-const Version = "0.2.2"
+const Version = "0.3.0"
 
 var appInstance *App
 
