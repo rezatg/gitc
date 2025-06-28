@@ -117,7 +117,7 @@ func (p *GenericProvider) GenerateCommitMessage(ctx context.Context, diff string
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
 
-	if err := p.client.DoRedirects(req, resp, opts.MaxRedirects); err != nil {
+	if err = p.client.DoRedirects(req, resp, opts.MaxRedirects); err != nil {
 		return "", fmt.Errorf("API request failed: %w", err)
 	}
 
