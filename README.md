@@ -25,31 +25,29 @@
 > `gitc` is a fast, lightweight CLI tool that uses AI to generate clear, consistent, and standards-compliant commit messages — directly from your Git diffs. With built-in support for [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and fully customizable rules, `gitc` helps you and your team write better commits, faster
 
 # 🚀 Features
-`gitc` streamlines your Git workflow by automating professional commit message creation with AI. Its robust feature set ensures flexibility and precision for developers and teams.
+`gitc` is a lightweight CLI tool that leverages AI to craft clear, standards-compliant Git commit messages from your diffs. Supporting [Conventional Commits](https://www.conventionalcommits.org), [Gitmoji](https://gitmoji.dev), and custom rules, it saves time and boosts commit quality for you and your team.
 
-- ### 🧠 AI and Commit Generation
-  - **AI-Powered Commit Messages**: Generates high-quality commit messages using OpenAI's API, analyzing staged git changes for context-aware results.
-  - **Multilingual Support**: Creates commit messages in multiple languages (e.g., English, Persian, Russian) to suit global teams.
-  - **Extensible AI Providers**: Supports OpenAI, Grok (xAI), and DeepSeek (experimental), with plans for Gemini and others, ensuring future-proofing.
+- 🧠 **AI-Powered Commits**
+  - Generates context-aware commit messages using OpenAI, Grok (xAI), or DeepSeek.
+  - Supports multiple languages (e.g., English, Persian, Russian) for global teams.
+  - Extensible for future AI providers like Gemini.
 
-- ### 📝 Commit Standards and Customization
-  - **Conventional Commits**: Adheres to standard commit types (`feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`, `revert`, `init`, `security`) for semantic versioning.
-  - **Gitmoji Integration**: Optionally adds Gitmoji emojis (e.g., ✨ for `feat`, 🚑 for `fix`) for visually appealing commits.
-  - **Custom Commit Conventions**: Supports JSON-based custom prefixes (e.g., JIRA ticket IDs) for tailored commit formats.
+- 📝 **Standards & Customization**
+  - Follows [Conventional Commits](https://www.conventionalcommits.org) (`feat`, `fix`, `docs`, etc.) for semantic versioning.
+  - Adds [Gitmoji](https://gitmoji.dev) emojis for visual flair (e.g., ✨, 🚑).
+  - Customizable prefixes (e.g., JIRA IDs) via JSON.
 
-- ### 🔧 Git Integration
-  - **Optimized Git Diff Processing**: Automatically retrieves and filters staged git diff, excluding irrelevant files (e.g., `node_modules/*`, `*.lock`).
-  - **Configurable Exclusions**: Customize file exclusion patterns via config file to focus on relevant changes.
+- 🔧 **Git Integration**
+  - Processes staged Git diffs, ignoring irrelevant files (`node_modules/*`, `*.lock`).
+  - Configurable file exclusions for focused commits.
 
-- ### ⚙️ Environment & Configuration
-  - **Flexible Configuration**: Customize via CLI flags, environment variables, or a JSON config file (`~/.gitc/config.json`).
-  - **Proxy Support**: Configurable proxy settings for API requests in restricted environments.
-  - **Timeout and Redirect Control**: Adjustable timeouts and HTTP redirect limits for reliable API interactions.
-  - **Environment Variable Support**: Simplifies setup for sensitive data (e.g., API keys) and common settings.
+- ⚙️ **Flexible Configuration**
+  - Supports CLI flags, environment variables, and `~/.gitc/config.json`.
+  - Includes proxy support, adjustable timeouts, and redirect limits.
 
-- ### ⚡️ Performance & Reliability
-  - **Fast Processing**: Leverages [sonic](https://github.com/bytedance/sonic) for rapid JSON parsing and [fasthttp](https://github.com/valyala/fasthttp) for efficient HTTP requests.
-  - **Error Handling**: Robust validation and error messages ensure reliable operation.
+- ⚡️ **Performance & Reliability**
+  - Fast JSON parsing with [sonic](https://github.com/bytedance/sonic) and HTTP requests with [fasthttp](https://github.com/valyala/fasthttp).
+  - Robust error handling for reliable operation.
 
 ## 📦 Installation
 ### Prerequisites:
