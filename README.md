@@ -145,7 +145,7 @@ The following CLI flags are available for the `ai-commit` command and its `confi
 > - Flags for the `config` subcommand are similar but exclude defaults, as they override the config file.
 > - **Flags** > **Environment Variables** > **Config File** — This is the order of precedence when multiple settings are provided.
 > - The `--custom-convention` flag expects a JSON string with a `prefix` field (e.g., `{"prefix": "JIRA-123"}`).
-> - The `--version` flag displays the current tool version (e.g., `0.2.0`) and can be used to verify installation.
+> - The `--version` flag displays the current tool version (e.g., `0.3.0`) and can be used to verify installation.
 > - The `--all` flag (alias `-a`) stages all changes in the working directory before generating the commit message, streamlining the workflow. For example, `gitc -a --emoji` stages all changes and generates a commit message with Gitmoji.
 > - Environment variables take precedence over config file settings but are overridden by CLI flags.
 > - You can reset all configuration values to their defaults by using gitc config `gitc reset-config`.
