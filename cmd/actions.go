@@ -14,7 +14,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// App encapsulates the application logic and dependencies
+// App encapsulates the core application logic and dependencies for gitc.
+// It provides methods for AI configuration, commit message generation, and Git operations.
 type App struct {
 	gitService git.GitService
 	config     *config.Config
@@ -28,7 +29,8 @@ func NewApp(gitService git.GitService, config *config.Config) *App {
 	}
 }
 
-// ConfigureAI constructs the AI configuration with proper validation
+// ConfigureAI builds and validates the AI configuration from CLI context.
+// It merges CLI flags with default values and performs validation.
 func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 	cfg := &ai.Config{
 		Provider:         c.String("provider"),
@@ -45,10 +47,10 @@ func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 		URL:              c.String("url"),
 	}
 
-	// Apply config defaults
+	// Apply default values for unset fields
 	a.applyConfigDefaults(cfg)
 
-	// Validate required fields
+	// Validate the configuration
 	if err := a.validateConfig(a.config); err != nil {
 		return nil, fmt.Errorf("invalid AI configuration: %w", err)
 	}
@@ -56,7 +58,8 @@ func (a *App) ConfigureAI(c *cli.Context) (*ai.Config, error) {
 	return cfg, nil
 }
 
-// generateCommitMessage generates a commit message based on git diff and AI configuration.
+// generateCommitMessage creates a commit message using AI based on the provided git diff.
+// It handles AI provider initialization, timeout management, and Gitmoji formatting.
 func (a *App) generateCommitMessage(ctx context.Context, diff string, cfg *ai.Config) (string, error) {
 	provider, err := a.initAIProvider(cfg)
 	if err != nil {
@@ -86,6 +89,37 @@ func (a *App) generateCommitMessage(ctx context.Context, diff string, cfg *ai.Co
 	}
 
 	return msg, nil
+}
+
+// formatGitCommand formats the git commit command for display based on message content.
+// Handles both single-line and multi-line commit messages.
+func formatGitCommand(msg string) string {
+	lines := strings.Split(msg, "\n")
+	nonEmptyLines := make([]string, 0, len(lines))
+
+	// Filter out empty lines
+	for _, line := range lines {
+		if trimmed := strings.TrimSpace(line); trimmed != "" {
+			nonEmptyLines = append(nonEmptyLines, trimmed)
+		}
+	}
+
+	if len(nonEmptyLines) == 0 {
+		return "git commit -m \"\""
+	}
+
+	if len(nonEmptyLines) == 1 {
+		return fmt.Sprintf("git commit -m \"%s\"", nonEmptyLines[0])
+	}
+
+	var builder strings.Builder
+	builder.WriteString(fmt.Sprintf("git commit -m \"%s\"", nonEmptyLines[0]))
+
+	for _, line := range nonEmptyLines[1:] {
+		builder.WriteString(fmt.Sprintf(" \\\n    -m \"%s\"", line))
+	}
+
+	return builder.String()
 }
 
 // CommitAction handles the generation of commit messages
@@ -119,30 +153,14 @@ func (a *App) CommitAction(c *cli.Context) error {
 		return fmt.Errorf("❌ failed to generate commit message: %w", err)
 	}
 
+	// Display the generated command
 	fmt.Println("✅ Commit message generated. You can now run:")
-	lines := strings.Split(msg, "\n")
+	fmt.Printf("   %s\n", formatGitCommand(msg))
 
-	if len(lines) == 1 {
-		fmt.Printf("   git commit -m \"%s\"\n", strings.TrimSpace(lines[0]))
-	} else {
-		fmt.Printf("   git commit -m \"%s\" \\\n", strings.TrimSpace(lines[0]))
-		for i, line := range lines[1:] {
-			line = strings.TrimSpace(line)
-			if line == "" {
-				continue
-			}
-
-			if i < len(lines[1:])-1 {
-				fmt.Printf("      -m \"%s\" \\\n", line)
-			} else {
-				fmt.Printf("      -m \"%s\"\n", line)
-			}
-		}
-	}
 	return nil
 }
 
-// ConfigAction handles configuration updates
+// ConfigAction handles updating and saving application configuration.
 func (a *App) ConfigAction(c *cli.Context) error {
 	cfg := *a.config
 	a.updateConfigFromFlags(&cfg, c)
@@ -160,7 +178,7 @@ func (a *App) ConfigAction(c *cli.Context) error {
 	return nil
 }
 
-// applyConfigDefaults sets default values for unset AI configuration fields.
+// applyConfigDefaults sets sensible default values for unset AI configuration fields.
 func (a *App) applyConfigDefaults(cfg *ai.Config) {
 	if cfg.Provider == "" {
 		cfg.Provider = a.config.Provider
@@ -199,19 +217,20 @@ func (a *App) applyConfigDefaults(cfg *ai.Config) {
 		case "grok":
 			cfg.URL = "https://api.x.ai/v1/chat/completions"
 		case "deepseek":
-			cfg.URL = "https://api.deepseek.com/v1/chat/completions" // فرضی
+			cfg.URL = "https://api.deepseek.com/v1/chat/completions"
 		default:
 			cfg.URL = a.config.URL
 		}
 	}
 }
 
-// initAIProvider initializes the AI provider based on the configuration.
+// initAIProvider initializes the appropriate AI provider based on configuration.
 func (a *App) initAIProvider(cfg *ai.Config) (ai.AIProvider, error) {
 	return generic.NewGenericProvider(cfg.APIKey, cfg.Proxy, cfg.URL, cfg.Provider)
 }
 
-// validateConfig checks if the AI configuration is valid.
+// validateConfig performs basic validation of the AI configuration.
+// Returns an error if required fields are missing or invalid.
 func (a *App) validateConfig(cfg *config.Config) error {
 	if cfg.Provider == "" {
 		return fmt.Errorf("AI provider is required")
@@ -228,7 +247,8 @@ func (a *App) validateConfig(cfg *config.Config) error {
 	return nil
 }
 
-// updateConfigFromFlags updates the configuration based on CLI flags.
+// updateConfigFromFlags updates the configuration with values from CLI flags.
+// Only updates fields that are explicitly set in the context.
 func (a *App) updateConfigFromFlags(cfg *config.Config, c *cli.Context) {
 	if provider := c.String("provider"); provider != "" {
 		cfg.Provider = provider

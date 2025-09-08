@@ -7,7 +7,9 @@ import (
 
 // AIProvider defines the interface for AI providers
 type AIProvider interface {
-	GenerateCommitMessage(ctx context.Context, diff string, opts MessageOptions) (string, error)
+	GenerateCommitMessage(
+		ctx context.Context, diff string, opts MessageOptions,
+	) (string, error)
 }
 
 // Config holds AI provider configuration
