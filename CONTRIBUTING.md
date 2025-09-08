@@ -1,97 +1,114 @@
 # 🤝 Contributing to `gitc`
 
-Thank you for your interest in contributing to **`gitc`** — an AI-powered CLI tool for generating commit messages from your git diffs.
+Thank you for your interest in contributing to **`gitc`**, an AI-powered CLI tool for generating meaningful commit messages from your Git diffs. Your contributions help make `gitc` better for everyone!
 
-We welcome all types of contributions, whether you're fixing bugs, suggesting features, improving documentation, or writing tests.
-
+We welcome all types of contributions, including bug fixes, feature additions, documentation improvements, and tests. This guide outlines how you can get involved.
 
 ## 📌 Table of Contents
-* [Code of Conduct](#-code-of-conduct)
-* [Getting Started](#-getting-started)
-* [Development Setup](#-development-setup)
-* [Making Contributions](#-making-contributions)
-* [Commit Message Guidelines](#-commit-message-guidelines)
-* [Pull Request Process](#-pull-request-process)
-* [Feature Suggestions & Bugs](#-feature-suggestions--bugs)
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Setup](#development-setup)
+- [Making Contributions](#making-contributions)
+- [Commit Message Guidelines](#commit-message-guidelines)
+- [Pull Request Process](#pull-request-process)
+- [Feature Suggestions & Bug Reports](#feature-suggestions--bug-reports)
+- [Community](#community)
 
 ## 📜 Code of Conduct
-We follow a [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). Please treat everyone respectfully and kindly.
+We are committed to fostering a welcoming and inclusive community. Please adhere to our [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). Treat everyone with respect and kindness.
 
 ## ⚙️ Getting Started
-1. **Fork** the repository.
-2. **Clone** your fork locally:
+To start contributing, follow these steps:
+
+1. **Fork the repository** on GitHub.
+2. **Clone your fork** to your local machine:
    ```bash
    git clone https://github.com/<your-username>/gitc.git
    cd gitc
    ```
-3. Create a new branch:
+3. **Create a new branch** for your changes:
    ```bash
-   git checkout -b feature/my-feature
+   git checkout -b feature/<your-feature-name>
    ```
 
 ## 🛠 Development Setup
-  Make sure you have:
-    * Go ≥ **1.18**
-    * Git
-    * (Optional) OpenAI API Key for testing
-  
-  Install dependencies:
-    ```bash
-    go mod tidy
-    ```
+To set up the development environment, ensure you have the following prerequisites:
+- **Go** ≥ 1.20
+- **Git**
+- (Optional) An **OpenAI API Key** for testing AI-powered features
 
-Build the project:
-  ```bash
-  go build -o gitc ./cmd/gitc
-  ```
-
-Run the tool:
-  ```bash
-  ./gitc --help
-  ```
-
-Run tests:
-  ```bash
-  go test ./...
-  ```
+### Steps:
+1. **Install dependencies**:
+   ```bash
+   go mod tidy
+   ```
+2. **Build the project**:
+   ```bash
+   go build -o gitc ./cmd/gitc
+   ```
+3. **Run the tool**:
+   ```bash
+   ./gitc --help
+   ```
+4. **Run tests**:
+   ```bash
+   go test ./...
+   ```
 
 ## ✍️ Making Contributions
-You can contribute in the following ways:
-  * 🐛 Bug Fixes
-  * 📄 Documentation Improvements
-  * 🚀 New Features
-  * ✅ Tests and Coverage
-  * 💡 Suggesting Ideas and Discussions
+We value contributions in many forms, including:
+- 🐛 **Fixing bugs**
+- 📄 **Improving documentation**
+- 🚀 **Adding new features**
+- ✅ **Writing or improving tests**
+- 💡 **Suggesting ideas** via discussions
 
-If unsure, [open a discussion](https://github.com/rezatg/gitc/discussions) or [create an issue](https://github.com/rezatg/gitc/issues) before starting work.
+If you're unsure where to start, check out our [GitHub Discussions](https://github.com/rezatg/gitc/discussions) or [Issues](https://github.com/rezatg/gitc/issues) for inspiration.
 
 ## 🧾 Commit Message Guidelines
-We follow [Conventional Commits](https://www.conventionalcommits.org) to ensure readable, semantic commit history.
+We use [Conventional Commits](https://www.conventionalcommits.org) to maintain a clear and semantic commit history. This ensures our changelog is easy to read and understand.
 
-Example:
-  ```bash
-  feat(config): add support for Gemini provider
-  fix(cli): handle missing config gracefully
-  docs(readme): update installation instructions
-  ```
+### Examples:
+```bash
+feat(config): add support for Gemini AI provider
+fix(cli): resolve crash when config file is missing
+docs(readme): clarify installation steps
+```
 
-> You can even use `gitc` itself to generate commit messages:
-  ```bash
-  gitc -a --commit-type feat
-  ```
+> **Pro Tip**: You can use `gitc` itself to generate commit messages! For example:
+> ```bash
+> gitc -a --commit-type feat
+> ```
+
+### Commit Types:
+- `feat`: New features or enhancements
+- `fix`: Bug fixes
+- `docs`: Documentation updates
+- `test`: Adding or improving tests
+- `refactor`: Code refactoring without changing functionality
+- `chore`: Miscellaneous tasks (e.g., updating dependencies)
 
 ## 🚀 Pull Request Process
-sure your PR targets the `main` branch.
-  2. Make sure all tests pass.
-  3. Write a meaningful title and description.
-  4. Link related issues (e.g., `Closes #42`).
-  5. Add relevant labels if possible.
-  6. Wait for code review and address feedback.
+To submit your changes:
+1. Ensure your pull request (PR) targets the **`main`** branch.
+2. Verify that all tests pass:
+   ```bash
+   go test ./...
+   ```
+3. Write a clear and descriptive PR title and description.
+4. Reference related issues (e.g., `Closes #42` or `Fixes #42`).
+5. Add relevant labels (e.g., `bug`, `feature`, `documentation`).
+6. Submit your PR and respond to any feedback during the code review process.
 
-## 💡 Feature Suggestions & Bugs
-* 💬 Found a bug? [Open an issue](https://github.com/rezatg/gitc/issues)
-* 💡 Have a feature idea? [Start a discussion](https://github.com/rezatg/gitc/discussions)
-* 🙌 Want to help but don’t know where to start? Look for [good first issues](https://github.com/rezatg/gitc/labels/good%20first%20issue)
+## 💡 Feature Suggestions & Bug Reports
+- **Report a bug**: Open an issue on our [Issues page](https://github.com/rezatg/gitc/issues).
+- **Suggest a feature**: Start a discussion on our [Discussions page](https://github.com/rezatg/gitc/discussions).
+- **New to contributing?** Look for issues labeled [`good first issue`](https://github.com/rezatg/gitc/labels/good%20first%20issue) to get started.
 
-## 🫶 Thank You!
-Your time, effort, and ideas make `gitc` better. We're thrilled to have you here 🙌
+## 🫶 Community
+Join our community to connect with other contributors:
+- Participate in [GitHub Discussions](https://github.com/rezatg/gitc/discussions) to share ideas or ask questions.
+- Stay updated by starring the repository and following along!
+
+## 🙌 Thank You!
+Your contributions—whether code, documentation, or ideas—make `gitc` better for everyone. We're excited to have you as part of our community! 🚀
